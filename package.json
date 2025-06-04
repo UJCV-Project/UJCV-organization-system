@@ -3,6 +3,7 @@
     "prisma": "^6.8.2"
   },
   "dependencies": {
+    "@nestjs/common": "^11.1.2",
     "@prisma/client": "^6.8.2"
   }
 }
