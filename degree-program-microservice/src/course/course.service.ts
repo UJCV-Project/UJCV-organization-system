@@ -19,6 +19,10 @@ export class CourseService {
     if (existingSubject) {
       throw new NotFoundException(`Ya existe una asignatura con el código: ${code}`);
     }
+    
+    else if(code.length>20){
+      throw new BadRequestException(`El codigo de asignatura se excedió la el número de digitos en el código de la clase en ${code.length}`)
+    }
 
     const subject = await this.prisma.subject.create({
       data: {
@@ -52,11 +56,11 @@ export class CourseService {
     }));
   }
 
-  async findOne(id: string) {
-    const subject = await this.prisma.subject.findUnique({ where :{id},});
+  async findOne(code: string) {
+    const subject = await this.prisma.subject.findUnique({ where :{code},});
 
     if(!subject){
-      throw new NotFoundException(`No se que encontro una asignatura con el ID: ${id}`)
+      throw new NotFoundException(`No se que encontro una asignatura con el código: ${code}`)
     }
     
     return {
@@ -69,10 +73,10 @@ export class CourseService {
     }
   }
 
-  async update(id: string, updateCourseDto: UpdateCourseDto) {
+  async update(code: string, updateCourseDto: UpdateCourseDto) {
     try {
       return await this.prisma.subject.update({
-        where: { id },
+        where: { code },
         data: updateCourseDto,
       });
     } catch (error) {
@@ -83,7 +87,12 @@ export class CourseService {
     }
   }
 
-  remove(id: string) {
-    return `This action removes a #${id} curriculum`;
+  async remove(code: string) {
+    const subject = await this.prisma.subject.findUnique({ where: { code } });
+    if (!subject) {
+      throw new NotFoundException(`No se encontró una asignatura con el código: ${code}`);
+    }
+
+    return this.prisma.subject.delete({ where: { code } });
   }
 }
