@@ -1,0 +1,93 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql" 
+  url      = env("DATABASE_URL") 
+}
+
+model DegreeProgram {
+  id          String        @id @default(uuid())
+  code        String        @unique @db.VarChar(20)
+  name        String        @db.VarChar(50)
+  description String        @db.VarChar(100)
+  status      DegreeProgramStatus @default(activo)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  curriculums Curriculum[]
+}
+
+enum DegreeProgramStatus {
+  activo
+  inactivo
+}
+
+model Curriculum {
+  id              String             @id @default(uuid())
+  code            String             @unique @db.VarChar(20)
+  degreeProgramId String
+  startDate       DateTime
+  endDate         DateTime
+  description     String             @db.VarChar(100)
+  status          CurriculumStatus   @default(activo)
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  degreeProgram   DegreeProgram      @relation(fields: [degreeProgramId], references: [id])
+  subjects        CurriculumSubject[]
+  prerequisites   Prerequisite[]     @relation("CurriculumPrerequisites")
+}
+
+enum CurriculumStatus {
+  activo
+  inactivo
+}
+
+model Subject {
+  id          String                @id @default(uuid())
+  code        String                @unique @db.VarChar(20)
+  name        String                @db.VarChar(50)
+  description String                @db.VarChar(100)
+  credits     Int
+  type        SubjectType           @default(Mandatory)
+
+  curriculums CurriculumSubject[]
+  prerequisitesFor Prerequisite[]   @relation("SubjectIsPrerequisite")
+  prerequisitesOf Prerequisite[]    @relation("SubjectHasPrerequisite")
+}
+
+enum SubjectType {
+  Mandatory
+  Elective
+}
+
+model CurriculumSubject {
+  curriculumId String
+  subjectId    String
+  semester     Int
+
+  curriculum   Curriculum @relation(fields: [curriculumId], references: [id])
+  subject      Subject    @relation(fields: [subjectId], references: [id])
+
+  @@id([curriculumId, subjectId])
+}
+
+model Prerequisite {
+  curriculumId       String
+  subjectId          String
+  prerequisiteId     String
+
+  curriculum         Curriculum @relation("CurriculumPrerequisites", fields: [curriculumId], references: [id])
+  subject            Subject    @relation("SubjectHasPrerequisite", fields: [subjectId], references: [id])
+  prerequisite       Subject    @relation("SubjectIsPrerequisite", fields: [prerequisiteId], references: [id])
+
+  @@id([curriculumId, subjectId, prerequisiteId])
+}
