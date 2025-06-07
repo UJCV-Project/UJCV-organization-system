@@ -1,15 +1,47 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CourseDto } from './dto/response-course.dto';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class CourseService {
   constructor(private readonly prisma: PrismaService) {}
 
-  create(createCourseDto: CreateCourseDto) {
-    return 'This action adds a new course';
+  async create(createCourseDto: CreateCourseDto) {
+    const { code, name, description, credits, type } = createCourseDto;
+
+    const existingSubject = await this.prisma.subject.findUnique({
+      where: { code },
+    });
+
+    if (existingSubject) {
+      throw new NotFoundException(`Ya existe una asignatura con el código: ${code}`);
+    }
+    
+    else if(code.length>20){
+      throw new BadRequestException(`El codigo de asignatura se excedió la el número de digitos en el código de la clase en ${code.length}`)
+    }
+
+    const subject = await this.prisma.subject.create({
+      data: {
+        code,
+        name,
+        description,
+        credits,
+        type,
+      },
+    });
+
+    return {
+      id: subject.id,
+      code: subject.code,
+      name: subject.name,
+      description: subject.description,
+      credits: subject.credits,
+      type: subject.type,
+    };
   }
 
   async findAll(): Promise<CourseDto[]> {
@@ -24,14 +56,13 @@ export class CourseService {
     }));
   }
 
-  async findOne(id: string) {
-    const subject = await this.prisma.subject.findUnique({ where :{id},});
+  async findOne(code: string) {
+    const subject = await this.prisma.subject.findUnique({ where :{code},});
 
     if(!subject){
-      throw new NotFoundException(`No se que encontro una asignatura con el ID: ${id}`)
+      throw new NotFoundException(`No se que encontro una asignatura con el código: ${code}`)
     }
-
-
+    
     return {
       id: subject.id,
       code: subject.code,
@@ -42,11 +73,26 @@ export class CourseService {
     }
   }
 
-  update(id: number, updateCourseDto: UpdateCourseDto) {
-    return `This action updates a #${id} course`;
+  async update(code: string, updateCourseDto: UpdateCourseDto) {
+    try {
+      return await this.prisma.subject.update({
+        where: { code },
+        data: updateCourseDto,
+      });
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+        throw new BadRequestException('El código de asignatura ya existe.');
+      }
+      throw error;
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} course`;
+  async remove(code: string) {
+    const subject = await this.prisma.subject.findUnique({ where: { code } });
+    if (!subject) {
+      throw new NotFoundException(`No se encontró una asignatura con el código: ${code}`);
+    }
+
+    return this.prisma.subject.delete({ where: { code } });
   }
 }

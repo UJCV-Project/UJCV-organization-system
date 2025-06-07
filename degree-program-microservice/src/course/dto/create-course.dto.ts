@@ -1,10 +1,5 @@
 import { IsString, IsInt, IsOptional, IsEnum } from 'class-validator';
-
-export enum SubjectType {
-    Mandatory = 'Mandatory',
-    Elective = 'Elective',
-}
-
+import { SubjectType } from '@prisma/client';
 export class CreateCourseDto {
     @IsString()
   code: string; // codigo(unico) de la asignatura
