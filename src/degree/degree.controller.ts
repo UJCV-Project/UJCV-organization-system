@@ -8,13 +8,13 @@ export class DegreeController {
   constructor(private readonly degreeService: DegreeService) {}
 
   @Post()
-  create(@Body() createDegreeDto: CreateDegreeDto) {
-    return this.degreeService.create(createDegreeDto);
+  async create(@Body() createDegreeDto: CreateDegreeDto) {
+    return await this.degreeService.create(createDegreeDto);
   }
 
   @Get()
-  findAll() {
-    return this.degreeService.findAll();
+  async findAll() {
+    return await this.degreeService.findAll();
   }
 
   @Get(':id')
