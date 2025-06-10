@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { DegreeService } from './degree.service';
 import { CreateDegreeDto } from './dto/create-degree.dto';
 import { UpdateDegreeDto } from './dto/update-degree.dto';
+import { DegreePaginationDto } from './dto/get-degree.dto';
 
 @Controller('degree')
 export class DegreeController {
@@ -13,8 +14,8 @@ export class DegreeController {
   }
 
   @Get()
-  async findAll() {
-    return await this.degreeService.findAll();
+  async findAll(@Query() degreePagination: DegreePaginationDto) {
+    return await this.degreeService.findAll(degreePagination);
   }
 
   @Get(':id')
@@ -25,10 +26,5 @@ export class DegreeController {
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateDegreeDto: UpdateDegreeDto) {
     return this.degreeService.update(id, updateDegreeDto); 
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.degreeService.remove(id);
   }
 }
