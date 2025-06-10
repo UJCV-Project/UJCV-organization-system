@@ -1,5 +1,5 @@
 import { IsString, IsEnum, IsOptional, MaxLength } from 'class-validator';
-import { DegreeProgramStatus } from '@prisma/client';
+import { DegreeProgramStatus } from '../enum/degree-status';
 import { PaginationDto } from 'src/common';
 
 export class DegreePaginationDto extends PaginationDto{

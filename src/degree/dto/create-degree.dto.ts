@@ -1,5 +1,6 @@
-import { IsString, IsEnum, IsOptional, IsNotEmpty, Max, MaxLength } from 'class-validator';
-import { DegreeProgramStatus } from '@prisma/client';
+import { IsString, IsEnum, IsOptional, IsNotEmpty, MaxLength } from 'class-validator';
+import { DegreeProgramStatus } from '../enum/degree-status';
+
 
 export class CreateDegreeDto {
     @IsString()

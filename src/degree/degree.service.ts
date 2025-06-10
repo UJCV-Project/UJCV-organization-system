@@ -1,9 +1,10 @@
-import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { CreateDegreeDto } from './dto/create-degree.dto';
 import { UpdateDegreeDto } from './dto/update-degree.dto';
 import { DegreeDto } from './dto/response-degree.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Prisma, DegreeProgramStatus } from '@prisma/client';
+import { Prisma } from '@prisma/client';
+import { DegreeProgramStatus } from './enum/degree-status';
 import { DegreePaginationDto } from './dto/get-degree.dto';
 
 @Injectable()
@@ -13,14 +14,14 @@ export class DegreeService {
 
   async create(createDegreeDto: CreateDegreeDto) {
     const code = createDegreeDto.code;
-    const existingDegree = await this.findOne(code);
+    const existingDegree = await this.prisma.degreeProgram.findFirst({where:{code}});
 
-    if (existingDegree.data.status === DegreeProgramStatus.activo) {
-      throw new NotFoundException(`Ya existe un programa de grado con el código: ${code}`);
+    if (existingDegree?.status === DegreeProgramStatus.activo) {
+      throw new ConflictException(`Ya existe un programa de grado con el código: ${code}`);
     }
 
     const degreeCreated = await this.prisma.degreeProgram.upsert({
-    where: { id: existingDegree!.data.id},
+    where: { id: existingDegree?.id},
     update: createDegreeDto, 
     create: createDegreeDto,
     });
@@ -60,7 +61,7 @@ export class DegreeService {
     };
   }
 
-  async findOne(id: string) {
+  async findById(id: string) {
     const degree = await this.prisma.degreeProgram.findUnique({ where: { id } });
     if (!degree) {
       throw new NotFoundException(`No se encontro un programa de grado con este identificador`)
@@ -70,7 +71,7 @@ export class DegreeService {
   }
 
   async update(id: string, updateDegreeDto: UpdateDegreeDto) {
-    await this.findOne(id);
+    await this.findById(id);
 
     try {
       return await this.prisma.degreeProgram.update({
@@ -85,16 +86,8 @@ export class DegreeService {
     }
   }
 
-  async changeStatus(id: string, status: DegreeProgramStatus){
-    await this.findOne(id);
-    return await this.prisma.degreeProgram.update({where: {id}, data:{status}});
-  }
-
-  async setActive(id: string){
-    this.changeStatus(id, DegreeProgramStatus.activo);
-  }
-
-  async setInactive(id: string){
-    this.changeStatus(id, DegreeProgramStatus.inactivo);
+  async delete(id: string){
+    await this.findById(id);
+    return await this.prisma.degreeProgram.update({where: {id}, data:{status: DegreeProgramStatus.inactivo}});
   }
 }

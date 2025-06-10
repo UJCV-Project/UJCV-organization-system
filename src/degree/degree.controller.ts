@@ -3,6 +3,7 @@ import { DegreeService } from './degree.service';
 import { CreateDegreeDto } from './dto/create-degree.dto';
 import { UpdateDegreeDto } from './dto/update-degree.dto';
 import { DegreePaginationDto } from './dto/get-degree.dto';
+import { DegreeProgramStatus } from './enum/degree-status';
 
 @Controller('degree')
 export class DegreeController {
@@ -20,11 +21,16 @@ export class DegreeController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.degreeService.findOne(id); 
+    return this.degreeService.findById(id); 
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateDegreeDto: UpdateDegreeDto) {
     return this.degreeService.update(id, updateDegreeDto); 
+  }
+
+  @Patch('/change-status/:id')
+  changeStatus(@Param('id') id: string) {
+    return this.degreeService.delete(id); 
   }
 }
