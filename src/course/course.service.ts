@@ -1,98 +1,95 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, ConflictException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CourseDto } from './dto/response-course.dto';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
 import { Prisma } from '@prisma/client';
+import { CourseStatus } from './enum/course-status';
+import { CoursePaginationDto } from './dto/get-course.dto';
 
 @Injectable()
 export class CourseService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(createCourseDto: CreateCourseDto) {
-    const { code, name, description, credits, type } = createCourseDto;
+    const code = createCourseDto.code;
+    const existingCourse= await this.prisma.course.findUnique({where:{code}});
 
-    const existingSubject = await this.prisma.subject.findUnique({
+    if (existingCourse?.status === CourseStatus.activo) {
+      throw new ConflictException(`Ya existe una clase con el código: ${code}`);
+    }
+
+    const course = await this.prisma.course.upsert({
       where: { code },
+      update: createCourseDto,
+      create: createCourseDto,
     });
 
-    if (existingSubject) {
-      throw new NotFoundException(`Ya existe una asignatura con el código: ${code}`);
-    }
-    
-    else if(code.length>20){
-      throw new BadRequestException(`El codigo de asignatura se excedió la el número de digitos en el código de la clase en ${code.length}`)
-    }
+    return course;
+  }
 
-    const subject = await this.prisma.subject.create({
-      data: {
-        code,
-        name,
-        description,
-        credits,
-        type,
+  async findAll(coursePagination: CoursePaginationDto) {
+    const { page = 1, limit = 10, ...conditions } = coursePagination;
+
+    const whereConditions: any = {
+      code: {
+        contains: conditions.code,
+        mode: 'insensitive',
       },
-    });
+      name: {
+        contains: conditions.name,
+        mode: 'insensitive',
+      },
+      degreeId: {
+        contains: conditions.degreeId,
+        mode: 'insensitive',
+      },
+      ...(conditions.status && {status: conditions.status}),
+    }
+
+    const totalPages = await this.prisma.course.count({ where: whereConditions });
+    const lastPage = Math.ceil(totalPages / (limit));
 
     return {
-      id: subject.id,
-      code: subject.code,
-      name: subject.name,
-      description: subject.description,
-      credits: subject.credits,
-      type: subject.type,
+      data: await this.prisma.course.findMany({
+        skip: (page - 1) * (limit),
+        take: limit,
+        where: whereConditions
+      }),
+      metadata: {
+        total: totalPages,
+        page: page,
+        lastPage: lastPage,
+      },
     };
   }
 
-  async findAll(): Promise<CourseDto[]> {
-    const subjects = await this.prisma.subject.findMany();
-    return subjects.map((subject) => ({
-      id: subject.id,
-      code: subject.code,
-      name: subject.name,
-      description: subject.description,
-      credits: subject.credits,
-      type: subject.type
-    }));
+  async findById(id: string) {
+    const course = await this.prisma.course.findUnique({ where: { id } });
+    if (!course) {
+      throw new NotFoundException(`No se encontro un programa de grado con este identificador`)
+    }
+
+    return {data: course};
   }
 
-  async findOne(code: string) {
-    const subject = await this.prisma.subject.findUnique({ where :{code},});
+  async update(id: string, updateCourseDto: UpdateCourseDto) {
+    await this.findById(id);
 
-    if(!subject){
-      throw new NotFoundException(`No se que encontro una asignatura con el código: ${code}`)
-    }
-    
-    return {
-      id: subject.id,
-      code: subject.code,
-      name: subject.name,
-      description: subject.description,
-      credits: subject.credits,
-      type: subject.type
-    }
-  }
-
-  async update(code: string, updateCourseDto: UpdateCourseDto) {
     try {
-      return await this.prisma.subject.update({
-        where: { code },
+      return await this.prisma.course.update({
+        where: { id },
         data: updateCourseDto,
       });
     } catch (error) {
+
       if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
-        throw new BadRequestException('El código de asignatura ya existe.');
+        throw new BadRequestException(`El codigo de clase ya existe`)
       }
-      throw error;
     }
   }
 
-  async remove(code: string) {
-    const subject = await this.prisma.subject.findUnique({ where: { code } });
-    if (!subject) {
-      throw new NotFoundException(`No se encontró una asignatura con el código: ${code}`);
-    }
-
-    return this.prisma.subject.delete({ where: { code } });
+  async delete(id: string){
+    await this.findById(id);
+    return await this.prisma.course.update({where: {id}, data:{status: CourseStatus.inactivo}});
   }
 }

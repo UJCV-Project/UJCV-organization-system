@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { CourseService } from './course.service';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
+import { CoursePaginationDto } from './dto/get-course.dto';
 
 @Controller('course')
 export class CourseController {
@@ -13,22 +14,22 @@ export class CourseController {
   }
 
   @Get()
-  findAll() {
-    return this.courseService.findAll();
+  findAll(@Param() coursePaginationDto:CoursePaginationDto) {
+    return this.courseService.findAll(coursePaginationDto);
   }
 
-  @Get(':code')
-  findOne(@Param('code') code: string) {
-    return this.courseService.findOne(code);
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.courseService.findById(id);
   }
 
-  @Patch(':code')
-  update(@Param('code') code: string, @Body() updateCourseDto: UpdateCourseDto) {
-    return this.courseService.update(code, updateCourseDto);
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() updateCourseDto: UpdateCourseDto) {
+    return this.courseService.update(id, updateCourseDto);
   }
 
-  @Delete(':code')
-  remove(@Param('code') code: string) {
-    return this.courseService.remove(code);
+  @Delete(':id')
+  delete(@Param('id') id: string) {
+    return this.courseService.delete(id);
   }
 }

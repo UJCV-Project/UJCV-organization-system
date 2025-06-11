@@ -1,9 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Query, Delete } from '@nestjs/common';
 import { DegreeService } from './degree.service';
 import { CreateDegreeDto } from './dto/create-degree.dto';
 import { UpdateDegreeDto } from './dto/update-degree.dto';
 import { DegreePaginationDto } from './dto/get-degree.dto';
-import { DegreeProgramStatus } from './enum/degree-status';
 
 @Controller('degree')
 export class DegreeController {
@@ -29,7 +28,7 @@ export class DegreeController {
     return this.degreeService.update(id, updateDegreeDto); 
   }
 
-  @Patch('/change-status/:id')
+  @Delete(':id')
   changeStatus(@Param('id') id: string) {
     return this.degreeService.delete(id); 
   }

@@ -1,8 +1,8 @@
 import { IsString, IsEnum, IsOptional, MaxLength } from 'class-validator';
-import { DegreeStatus } from '../enum/degree-status';
+import { CourseStatus } from '../enum/course-status';
 import { PaginationDto } from 'src/common';
 
-export class DegreePaginationDto extends PaginationDto{
+export class CoursePaginationDto extends PaginationDto{
     @IsString()
     @MaxLength(20)
     @IsOptional()
@@ -14,8 +14,13 @@ export class DegreePaginationDto extends PaginationDto{
     name?: string = '';
 
     @IsString()
-    @IsEnum(DegreeStatus)
+    @MaxLength(100)
     @IsOptional()
-    status?: DegreeStatus = DegreeStatus.activo;
+    degreeId?: string = '';
+
+    @IsString()
+    @IsEnum(CourseStatus)
+    @IsOptional()
+    status?: CourseStatus = CourseStatus.activo;
 }
 

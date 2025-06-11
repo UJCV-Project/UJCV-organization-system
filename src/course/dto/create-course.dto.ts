@@ -1,19 +1,24 @@
-import { IsString, IsInt, IsOptional, IsEnum } from 'class-validator';
-import { SubjectType } from '@prisma/client';
+import { IsString, IsInt, IsNotEmpty, Min, IsOptional } from 'class-validator';
+import { CourseStatus } from '../enum/course-status';
 export class CreateCourseDto {
-    @IsString()
+  @IsString()
+  @IsNotEmpty()
   code: string; // codigo(unico) de la asignatura
 
-    @IsString()
+  @IsString()
+  @IsNotEmpty()
   name: string; // Nombre de la asignatura
 
-    @IsString()
-  description: string; // una descripcion breve de la clase
+  @IsString()
+  @IsNotEmpty()
+  degreeId: string; // Carrera
 
-    @IsInt()
+  @IsInt()
+  @IsNotEmpty()
+  @Min(3)
   credits: number; // numero de creditos 
 
-    @IsEnum(SubjectType)
-    @IsOptional()
-  type?: SubjectType; // tiene un valor por defecto,por eso es opcional
+  @IsOptional()
+  @IsString()
+  status: CourseStatus = CourseStatus.activo;
 }

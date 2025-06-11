@@ -9,10 +9,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const config = new DocumentBuilder()
-    .setTitle('Classes Microservice')
-    .setDescription('The classes API description')
-    .setVersion('1.0')
-    .addTag('classes')
+    .setTitle('Courses Microservice')
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);

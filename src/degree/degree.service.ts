@@ -1,10 +1,9 @@
 import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { CreateDegreeDto } from './dto/create-degree.dto';
 import { UpdateDegreeDto } from './dto/update-degree.dto';
-import { DegreeDto } from './dto/response-degree.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Prisma } from '@prisma/client';
-import { DegreeProgramStatus } from './enum/degree-status';
+import { DegreeStatus,  } from './enum/degree-status';
 import { DegreePaginationDto } from './dto/get-degree.dto';
 
 @Injectable()
@@ -14,14 +13,14 @@ export class DegreeService {
 
   async create(createDegreeDto: CreateDegreeDto) {
     const code = createDegreeDto.code;
-    const existingDegree = await this.prisma.degreeProgram.findFirst({where:{code}});
+    const existingDegree = await this.prisma.degree.findFirst({where:{code}});
 
-    if (existingDegree?.status === DegreeProgramStatus.activo) {
-      throw new ConflictException(`Ya existe un programa de grado con el código: ${code}`);
+    if (existingDegree?.status === DegreeStatus.activo) {
+      throw new ConflictException(`Ya existe una carrera con el código: ${code}`);
     }
 
-    const degreeCreated = await this.prisma.degreeProgram.upsert({
-    where: { id: existingDegree?.id},
+    const degreeCreated = await this.prisma.degree.upsert({
+    where: { code },
     update: createDegreeDto, 
     create: createDegreeDto,
     });
@@ -44,11 +43,11 @@ export class DegreeService {
       ...(conditions.status && {status: conditions.status}),
     }
 
-    const totalPages = await this.prisma.degreeProgram.count({ where: whereConditions });
+    const totalPages = await this.prisma.degree.count({ where: whereConditions });
     const lastPage = Math.ceil(totalPages / (limit));
 
     return {
-      data: await this.prisma.degreeProgram.findMany({
+      data: await this.prisma.degree.findMany({
         skip: (page - 1) * (limit),
         take: limit,
         where: whereConditions
@@ -62,7 +61,7 @@ export class DegreeService {
   }
 
   async findById(id: string) {
-    const degree = await this.prisma.degreeProgram.findUnique({ where: { id } });
+    const degree = await this.prisma.degree.findUnique({ where: { id } });
     if (!degree) {
       throw new NotFoundException(`No se encontro un programa de grado con este identificador`)
     }
@@ -74,7 +73,7 @@ export class DegreeService {
     await this.findById(id);
 
     try {
-      return await this.prisma.degreeProgram.update({
+      return await this.prisma.degree.update({
         where: { id },
         data: updateDegreeDto,
       });
@@ -88,6 +87,6 @@ export class DegreeService {
 
   async delete(id: string){
     await this.findById(id);
-    return await this.prisma.degreeProgram.update({where: {id}, data:{status: DegreeProgramStatus.inactivo}});
+    return await this.prisma.degree.update({where: {id}, data:{status: DegreeStatus.inactivo}});
   }
 }

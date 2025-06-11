@@ -1,5 +1,5 @@
 import { IsString, IsEnum, IsOptional, IsNotEmpty, MaxLength } from 'class-validator';
-import { DegreeProgramStatus } from '../enum/degree-status';
+import { DegreeStatus } from '../enum/degree-status';
 
 
 export class CreateDegreeDto {
@@ -12,17 +12,8 @@ export class CreateDegreeDto {
     @IsNotEmpty()
     name: string;
 
-    @IsString()
-    @IsNotEmpty()
-    description: string;
-
-    //TODO: Esto debe de ser un ENUM en vez de un string;
-    /*@IsString()
-    @IsNotEmpty()
-    faculty: string;*/
-
-    @IsEnum(DegreeProgramStatus)
     @IsOptional()
-    status?: DegreeProgramStatus;
+    @IsString()
+    status: DegreeStatus = DegreeStatus.activo;
 }
 
