@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { CourseService } from './course.service';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
@@ -13,14 +13,24 @@ export class CourseController {
     return this.courseService.create(createCourseDto);
   }
 
-  @Get()
-  findAll(@Param() coursePaginationDto:CoursePaginationDto) {
-    return this.courseService.findAll(coursePaginationDto);
+  @Post('/data-dump')
+  createMany(@Body() createCourseDto:any[]) {
+    return this.courseService.createMany(createCourseDto);
   }
 
-  @Get(':id')
+  @Get()
+  async findAll(@Query() coursePaginationDto:CoursePaginationDto) {
+    return await this.courseService.findAll(coursePaginationDto);
+  }
+
+  @Get('id/:id')
   findOne(@Param('id') id: string) {
     return this.courseService.findById(id);
+  }
+
+  @Get('/list')
+  async listCourses() {
+    return await this.courseService.listCourses();
   }
 
   @Patch(':id')

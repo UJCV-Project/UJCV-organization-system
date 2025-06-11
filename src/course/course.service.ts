@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException, ConflictException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, ConflictException, Logger } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
@@ -9,6 +9,7 @@ import { CoursePaginationDto } from './dto/get-course.dto';
 @Injectable()
 export class CourseService {
   constructor(private readonly prisma: PrismaService) {}
+  logger = new Logger('Course Service')
 
   async create(createCourseDto: CreateCourseDto) {
     const code = createCourseDto.code;
@@ -27,6 +28,16 @@ export class CourseService {
     return course;
   }
 
+  //! DELETE 
+  async createMany(data) {
+    this.logger.log(data);
+  return await this.prisma.course.createMany({
+    data,
+    skipDuplicates: true,
+  });
+}
+
+
   async findAll(coursePagination: CoursePaginationDto) {
     const { page = 1, limit = 10, ...conditions } = coursePagination;
 
@@ -39,10 +50,7 @@ export class CourseService {
         contains: conditions.name,
         mode: 'insensitive',
       },
-      degreeId: {
-        contains: conditions.degreeId,
-        mode: 'insensitive',
-      },
+      ...(conditions.degreeId && {degreeId: conditions.degreeId}),
       ...(conditions.status && {status: conditions.status}),
     }
 
@@ -68,9 +76,32 @@ export class CourseService {
     if (!course) {
       throw new NotFoundException(`No se encontro un programa de grado con este identificador`)
     }
-
     return {data: course};
   }
+
+    async listCourses() {
+      
+      const listCourses = await this.prisma.course.findMany({
+        where: { status: CourseStatus.activo},
+        select: {
+          id: true,
+          code: true,
+          name: true,
+        }
+      });
+
+      if (!listCourses) {
+        return [];
+      }
+  
+      const result = listCourses.map(course => ({
+        id: course.id,
+        text: `${course.code} ${course.name}`
+      }));
+      
+      return result;
+    }
+
 
   async update(id: string, updateCourseDto: UpdateCourseDto) {
     await this.findById(id);

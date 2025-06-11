@@ -1,0 +1,22 @@
+[
+    {
+    "code": "ARQ",
+    "name": "ARQUITECTURA"
+    },
+    {
+    "code": "IIT",
+    "name": "INGENIERIA EN INFOTECNOLOGIA"
+    },
+    {
+    "code": "INT",
+    "name": "DISEÑO DE INTERIORES"
+    },
+    {
+    "code": "IIN",
+    "name": "INGENIERIA INDUSTRIAL"
+    },
+    {
+    "code": "ICI",
+    "name": "INGENIERIA CIVIL"
+    }
+]

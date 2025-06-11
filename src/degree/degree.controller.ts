@@ -13,14 +13,26 @@ export class DegreeController {
     return await this.degreeService.create(createDegreeDto);
   }
 
+  //!Delete later
+  @Post('/data-dump')
+  async createMultiple(@Body() createDegreeDto:any[]) {
+    return await this.degreeService.createMany(createDegreeDto);
+
+  }
+
   @Get()
   async findAll(@Query() degreePagination: DegreePaginationDto) {
     return await this.degreeService.findAll(degreePagination);
   }
 
-  @Get(':id')
+  @Get('id/:id')
   findOne(@Param('id') id: string) {
     return this.degreeService.findById(id); 
+  }
+
+  @Get('/list')
+  async listDegree() {
+    return await this.degreeService.listDegree();
   }
 
   @Patch(':id')

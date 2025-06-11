@@ -9,14 +9,20 @@ export class CreateCourseDto {
   @IsNotEmpty()
   name: string; // Nombre de la asignatura
 
-  @IsString()
-  @IsNotEmpty()
-  degreeId: string; // Carrera
-
   @IsInt()
   @IsNotEmpty()
   @Min(3)
-  credits: number; // numero de creditos 
+  unitValue: number; // numero de creditos 
+
+  @IsInt()
+  @IsNotEmpty()
+  @Min(0)
+  theoryHours: number; // horas teóricas
+
+  @IsInt()
+  @IsNotEmpty()
+  @Min(0)
+  practiceHours: number; // horas prácticas
 
   @IsOptional()
   @IsString()

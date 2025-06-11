@@ -4,14 +4,9 @@ import { PaginationDto } from 'src/common';
 
 export class DegreePaginationDto extends PaginationDto{
     @IsString()
-    @MaxLength(20)
-    @IsOptional()
-    code?: string = '';
-
-    @IsString()
     @MaxLength(100)
     @IsOptional()
-    name?: string = '';
+    search?: string = '';
 
     @IsString()
     @IsEnum(DegreeStatus)
