@@ -2,9 +2,9 @@ import { Injectable, NotFoundException, BadRequestException, ConflictException, 
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
-import { Prisma } from '@prisma/client';
 import { CourseStatus } from './enum/course-status';
 import { CoursePaginationDto } from './dto/get-course.dto';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class CourseService {
@@ -27,16 +27,6 @@ export class CourseService {
 
     return course;
   }
-
-  //! DELETE 
-  async createMany(data) {
-    this.logger.log(data);
-  return await this.prisma.course.createMany({
-    data,
-    skipDuplicates: true,
-  });
-}
-
 
   async findAll(coursePagination: CoursePaginationDto) {
     const { page = 1, limit = 10, ...conditions } = coursePagination;
@@ -87,7 +77,8 @@ export class CourseService {
           id: true,
           code: true,
           name: true,
-        }
+        },
+      orderBy:{name: 'asc'}
       });
 
       if (!listCourses) {
@@ -96,7 +87,7 @@ export class CourseService {
   
       const result = listCourses.map(course => ({
         id: course.id,
-        text: `${course.code} ${course.name}`
+        text: `${course.code} | ${course.name}`
       }));
       
       return result;
@@ -113,7 +104,7 @@ export class CourseService {
       });
     } catch (error) {
 
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+      if (error instanceof PrismaClientKnownRequestError && error.code === 'P2002') {
         throw new BadRequestException(`El codigo de clase ya existe`)
       }
     }

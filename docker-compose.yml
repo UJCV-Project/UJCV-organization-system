@@ -2,9 +2,10 @@ services:
   api:
     build: .
     ports:
-      - "17504:17504"
+      - "17504:3000"
     environment:
-      - DATABASE_URL=postgresql://postgres:example@postgres:5433/classes?schema=public
+      - PORT=3000
+      - DATABASE_URL=postgresql://postgres:example@postgres:5432/classes?schema=public
     depends_on:
       - postgres
     volumes:
@@ -14,7 +15,6 @@ services:
       sh -c "
         npx prisma generate &&
         npx prisma migrate deploy &&
-        npx prisma db seed &&
         node dist/main.js
       "
 

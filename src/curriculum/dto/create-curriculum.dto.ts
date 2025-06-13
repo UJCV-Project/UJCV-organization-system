@@ -1,8 +1,10 @@
-import {IsUUID, IsOptional, IsInt, Min } from 'class-validator';
+import {IsUUID, IsOptional, IsInt, Min, IsString } from 'class-validator';
 export class CreateCurriculumDto {
   @IsUUID()
+  @IsString()
   degreeId: string;
 
+  @IsString()
   @IsUUID()
   courseId: string;
 

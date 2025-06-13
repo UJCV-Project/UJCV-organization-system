@@ -13,13 +13,6 @@ export class DegreeController {
     return await this.degreeService.create(createDegreeDto);
   }
 
-  //!Delete later
-  @Post('/data-dump')
-  async createMultiple(@Body() createDegreeDto:any[]) {
-    return await this.degreeService.createMany(createDegreeDto);
-
-  }
-
   @Get()
   async findAll(@Query() degreePagination: DegreePaginationDto) {
     return await this.degreeService.findAll(degreePagination);

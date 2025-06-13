@@ -13,11 +13,6 @@ export class CourseController {
     return this.courseService.create(createCourseDto);
   }
 
-  @Post('/data-dump')
-  createMany(@Body() createCourseDto:any[]) {
-    return this.courseService.createMany(createCourseDto);
-  }
-
   @Get()
   async findAll(@Query() coursePaginationDto:CoursePaginationDto) {
     return await this.courseService.findAll(coursePaginationDto);

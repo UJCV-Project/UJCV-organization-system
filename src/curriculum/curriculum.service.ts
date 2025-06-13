@@ -5,7 +5,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class CurriculumService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async create(createCurriculumDto: CreateCurriculumDto) {
     const { degreeId, courseId, semester } = createCurriculumDto;
@@ -18,43 +18,34 @@ export class CurriculumService {
     });
   }
 
-async findDegreeCoursesBySemester(degreeId: string) {
-  const curriculumData = await this.prisma.curriculum.findMany({
-    include: {
-      course: {
-        select: {
-          name: true,
-        },
-      },
-    },
-    where: { degreeId },
-    orderBy: {
-      semester: 'asc',
-    },
-  });
-
-  // Group by semester in memory (still needed)
-  const grouped = curriculumData.reduce((acc, item) => {
-    const semester = item.semester || 0;
-
-    if (!acc[semester]) {
-      acc[semester] = [];
-    }
-
-    acc[semester].push({
-      ...item,
-      course: item.course.name,
+  async findDegreeCoursesBySemester(degreeId: string) {
+    const curriculumData = await this.prisma.curriculum.findMany({
+      include: {course: true},
+      where: { degreeId },
+      orderBy: {semester: 'asc',},
     });
 
-    return acc;
-  }, {} as Record<number, any[]>);
 
-  // Map to sorted array (already sorted)
-  return Object.entries(grouped).map(([semester, courses]) => ({
-    semester: Number(semester),
-    courses,
-  }));
-}
+    const grouped = curriculumData.reduce((acc, item) => {
+      const semester = item.semester || 0;
+
+      if (!acc[semester]) {
+        acc[semester] = [];
+      }
+
+      acc[semester].push({
+        ...item.course,
+      });
+
+      return acc;
+    }, {} as Record<number, any[]>);
+
+    // Map to sorted array (already sorted)
+    return Object.entries(grouped).map(([semester, courses]) => ({
+      semester: Number(semester),
+      courses,
+    }));
+  }
 
   async remove(deleteCurriculumDto: DeleteCurriculumDto) {
     const { degreeId, courseId } = deleteCurriculumDto;

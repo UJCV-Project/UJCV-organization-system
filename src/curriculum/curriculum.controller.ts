@@ -12,9 +12,9 @@ export class CurriculumController {
     return this.curriculumService.create(createCurriculumDto);
   }
 
-  @Get()
-  findAll(@Param('degreeId') degreeId: string) {
-    return this.curriculumService.findDegreeCoursesBySemester(degreeId);
+  @Get('/:degreeId')
+  async findAll(@Param('degreeId') degreeId: string) {
+    return await this.curriculumService.findDegreeCoursesBySemester(degreeId);
   }
 
   @Delete()

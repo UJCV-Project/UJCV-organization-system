@@ -2,9 +2,9 @@ import { BadRequestException, ConflictException, Injectable, Logger, NotFoundExc
 import { CreateDegreeDto } from './dto/create-degree.dto';
 import { UpdateDegreeDto } from './dto/update-degree.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Prisma } from '@prisma/client';
 import { DegreeStatus, } from './enum/degree-status';
 import { DegreePaginationDto } from './dto/get-degree.dto';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class DegreeService {
@@ -27,15 +27,6 @@ export class DegreeService {
 
     return degreeCreated;
   }
-
-  //!DELETE LATER
-  async createMany(data: any) {
-    this.logger.log(data);
-  return await this.prisma.degree.createMany({
-    data,
-    skipDuplicates: true, 
-  });
-}
 
   async findAll(degreePagination: DegreePaginationDto) {
     const { page = 1, limit = 10, ...conditions } = degreePagination;
@@ -85,7 +76,8 @@ export class DegreeService {
         id: true,
         code: true,
         name: true,
-      }
+      },
+      orderBy:{name: 'asc'}
     });
 
     if (!listDegree) {
@@ -94,7 +86,7 @@ export class DegreeService {
 
     const result = listDegree.map(degree => ({
       id: degree.id,
-      text: `${degree.code} ${degree.name}`
+      text: `${degree.code} | ${degree.name}`
     }));
 
     return result;
@@ -110,7 +102,7 @@ export class DegreeService {
       });
     } catch (error) {
 
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+      if (error instanceof PrismaClientKnownRequestError && error.code === 'P2002') {
         throw new BadRequestException(`El codigo de programa de grado ya existe`)
       }
     }
