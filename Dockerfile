@@ -1,4 +1,3 @@
-# Stage 1: Build
 FROM node:18 AS builder
 
 WORKDIR /app
@@ -8,15 +7,20 @@ COPY . .
 RUN npm run build
 RUN npx prisma generate
 
-# Stage 2: Run
+# Stage 2: Dev container
 FROM node:18
 
 WORKDIR /app
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./
-COPY --from=builder /app/prisma ./prisma
 
+# Copy source code into container
+COPY . .
+
+# Install dependencies (inside the running container)
+RUN npm install
+
+# Set environment variables
+ENV NODE_ENV=development
 EXPOSE 3000
 
-CMD ["node", "dist/main.js"]
+# Start in dev mode (hot reload)
+CMD ["npm", "run", "start:dev"]
