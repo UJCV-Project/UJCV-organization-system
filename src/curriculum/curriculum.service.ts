@@ -40,7 +40,6 @@ export class CurriculumService {
       return acc;
     }, {} as Record<number, any[]>);
 
-    // Map to sorted array (already sorted)
     return Object.entries(grouped).map(([semester, courses]) => ({
       semester: Number(semester),
       courses,
