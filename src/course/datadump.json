@@ -1,0 +1,80 @@
+[
+  { "name": "ESPAÑOL", "code": "ESP1014", "theoryHours": 3, "practiceHours": 0, "unitValue": 3 },
+  { "name": "ALGEBRA", "code": "MAT1014", "theoryHours": 4, "practiceHours": 0, "unitValue": 4 },
+  { "name": "GEOMETRIA Y TRIGONOMETRIA", "code": "MAT1015", "theoryHours": 4, "practiceHours": 0, "unitValue": 4 },
+  { "name": "IDIOMA EXTRANJERO I", "code": "IDI1015", "theoryHours": 5, "practiceHours": 0, "unitValue": 5 },
+
+  { "name": "ALFABETIZACION DIGITAL", "code": "IIT1015", "theoryHours": 1, "practiceHours": 6, "unitValue": 3 },
+  { "name": "TECNICAS DE COMUNICACION", "code": "ESP1024", "theoryHours": 3, "practiceHours": 3, "unitValue": 4 },
+  { "name": "VECTORES Y MATRICES", "code": "MAT1021", "theoryHours": 3, "practiceHours": 0, "unitValue": 3 },
+  { "name": "CALCULO I", "code": "MAT1022", "theoryHours": 4, "practiceHours": 0, "unitValue": 4 },
+  { "name": "IDIOMA EXTRANJERO II", "code": "IDI1026", "theoryHours": 5, "practiceHours": 0, "unitValue": 5 },
+
+  { "name": "DEPORTE/ARTE", "code": "EDF2011", "theoryHours": 0, "practiceHours": 3, "unitValue": 1 },
+  { "name": "MATEMATICAS DISCRETAS", "code": "MAT1030", "theoryHours": 3, "practiceHours": 0, "unitValue": 3 },
+  { "name": "CALCULO II", "code": "MAT1032", "theoryHours": 4, "practiceHours": 0, "unitValue": 4 },
+  { "name": "FISICA I", "code": "FIS1035", "theoryHours": 3, "practiceHours": 3, "unitValue": 4 },
+  { "name": "IDIOMA EXTRANJERO III", "code": "IDI1037", "theoryHours": 5, "practiceHours": 0, "unitValue": 5 },
+
+
+
+  { "name": "HISTORIA DE HONDURAS", "code": "HIS2024", "theoryHours": 3, "practiceHours": 0, "unitValue": 3 },
+  { "name": "FUNDAMENTOS DE PROGRAMACION", "code": "IIT2010", "theoryHours": 3, "practiceHours": 3, "unitValue": 4 },
+  { "name": "ECUACIONES DIFERENCIALES", "code": "MAT2015", "theoryHours": 3, "practiceHours": 0, "unitValue": 3 },
+  { "name": "FISICA II", "code": "FIS2012", "theoryHours": 3, "practiceHours": 3, "unitValue": 4 },
+  { "name": "SOCIOLOGIA", "code": "SOC1014", "theoryHours": 3, "practiceHours": 0, "unitValue": 3 },
+
+  { "name": "PROBABILIDADES Y ESTADISTICA", "code": "MAT2095", "theoryHours": 3, "practiceHours": 0, "unitValue": 3 },
+  { "name": "PROGRAMACION I", "code": "IIT2025", "theoryHours": 3, "practiceHours": 3, "unitValue": 4 },
+  { "name": "ANALISIS NUMERICO", "code": "MAT2024", "theoryHours": 3, "practiceHours": 0, "unitValue": 3 },
+  { "name": "FISICA III", "code": "FIS2025", "theoryHours": 3, "practiceHours": 3, "unitValue": 4 },
+  { "name": "ECOLOGIA", "code": "BIO1034", "theoryHours": 3, "practiceHours": 0, "unitValue": 3 },
+
+  { "name": "SISTEMAS OPERATIVOS I", "code": "IIT2032", "theoryHours": 2, "practiceHours": 3, "unitValue": 3 },
+  { "name": "PROGRAMACION II", "code": "IIT2035", "theoryHours": 3, "practiceHours": 3, "unitValue": 4 },
+  { "name": "ESTRUCTURA DE DATOS Y ALGORITMOS", "code": "IIT2036", "theoryHours": 3, "practiceHours": 0, "unitValue": 3 },
+  { "name": "PRINCIPIOS DE ELECTRONICA", "code": "IIT2037", "theoryHours": 3, "practiceHours": 3, "unitValue": 4 },
+  { "name": "ADMINISTRACION I", "code": "ADM2011", "theoryHours": 3, "practiceHours": 0, "unitValue": 3 },
+
+
+
+    { "name": "SISTEMAS OPERATIVOS II", "code": "IIT3011", "theoryHours": 2, "practiceHours": 3, "unitValue": 3 },
+  { "name": "PROGRAMACION DE DISPOSITIVOS MOVILES", "code": "IIT3012", "theoryHours": 3, "practiceHours": 0, "unitValue": 3 },
+  { "name": "BASE DE DATOS RELACIONALES", "code": "IIT3014", "theoryHours": 4, "practiceHours": 0, "unitValue": 4 },
+  { "name": "ELECTRONICA DIGITAL", "code": "IIT3015", "theoryHours": 3, "practiceHours": 3, "unitValue": 4 },
+  { "name": "CONTABILIDAD I", "code": "ADM2010", "theoryHours": 2, "practiceHours": 3, "unitValue": 3 },
+
+  { "name": "REDES Y COMUNICACIONES I", "code": "IIT3021", "theoryHours": 3, "practiceHours": 3, "unitValue": 4 },
+  { "name": "ANALISIS Y DISEÑO DE SISTEMAS DE INFORMACION", "code": "IIT3022", "theoryHours": 3, "practiceHours": 0, "unitValue": 3 },
+  { "name": "BASE DE DATOS ORIENTADAS A OBJETOS", "code": "IIT3024", "theoryHours": 4, "practiceHours": 0, "unitValue": 4 },
+  { "name": "ARQUITECTURA DE COMPUTADORAS", "code": "IIT3025", "theoryHours": 3, "practiceHours": 3, "unitValue": 4 },
+  { "name": "ADMINISTRACION DE RECURSOS HUMANOS I", "code": "ADM3011", "theoryHours": 3, "practiceHours": 0, "unitValue": 3 },
+
+  { "name": "REDES Y COMUNICACIONES II", "code": "IIT3031", "theoryHours": 4, "practiceHours": 0, "unitValue": 4 },
+  { "name": "INGENIERIA DE SOFTWARE I", "code": "IIT3032", "theoryHours": 3, "practiceHours": 0, "unitValue": 3 },
+  { "name": "DISEÑO Y ADMINISTRACION DE CONTENIDOS", "code": "IIT3033", "theoryHours": 3, "practiceHours": 3, "unitValue": 4 },
+  { "name": "MICROCONTROLADORES", "code": "IIT3035", "theoryHours": 3, "practiceHours": 3, "unitValue": 4 },
+  { "name": "PLANEACION ESTRATETICA", "code": "ADM3032", "theoryHours": 2, "practiceHours": 3, "unitValue": 3 },
+
+
+
+  
+  { "name": "SEGURIDAD DE LA INFORMACION", "code": "IIT4011", "theoryHours": 4, "practiceHours": 0, "unitValue": 4 },
+  { "name": "INGENIERIA DE SOFTWARE II", "code": "IIT4012", "theoryHours": 3, "practiceHours": 0, "unitValue": 3 },
+  { "name": "DESARROLLO DE APLICACIONES WEB", "code": "IIT4013", "theoryHours": 3, "practiceHours": 3, "unitValue": 4 },
+  { "name": "MICROPROCESADORES", "code": "IIT4015", "theoryHours": 3, "practiceHours": 3, "unitValue": 4 },
+  { "name": "GESTION DE LA INNOVACION", "code": "ADM4012", "theoryHours": 3, "practiceHours": 0, "unitValue": 3 },
+
+  { "name": "SEGURIDAD EN REDES INALAMBRICAS", "code": "IIT4021", "theoryHours": 3, "practiceHours": 0, "unitValue": 3 },
+  { "name": "AUDITORIA DE SISTEMAS DE INFORMACION", "code": "IIT4022", "theoryHours": 4, "practiceHours": 0, "unitValue": 4 },
+  { "name": "ECOLOGIA DE LA INFORMACION", "code": "IIT4027", "theoryHours": 3, "practiceHours": 0, "unitValue": 3 },
+  { "name": "CABLEADO ESTRUCTURADO", "code": "IIT4028", "theoryHours": 2, "practiceHours": 3, "unitValue": 3 },
+  { "name": "GERENCIA DE PROYECTOS", "code": "ADM4021", "theoryHours": 3, "practiceHours": 0, "unitValue": 3 },
+
+  { "name": "GESTION DE LA SEGURIDAD DE LA INFORMACION", "code": "IIT4031", "theoryHours": 3, "practiceHours": 0, "unitValue": 3 },
+  { "name": "METODOS DE INVESTIGACION", "code": "ADM2012", "theoryHours": 3, "practiceHours": 0, "unitValue": 3 },
+  { "name": "DERECHO DIGITAL", "code": "DER4033", "theoryHours": 3, "practiceHours": 0, "unitValue": 3 },
+  { "name": "DESARROLLO EMPRESARIAL", "code": "ADM4032", "theoryHours": 3, "practiceHours": 0, "unitValue": 3 },
+  { "name": "GERENCIA DE LA INFOTECNOLOGIA", "code": "IIT4032", "theoryHours": 3, "practiceHours": 0, "unitValue": 3 }
+
+]
