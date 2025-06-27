@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { CourseService } from './course.service';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
@@ -14,7 +23,7 @@ export class CourseController {
   }
 
   @Get()
-  async findAll(@Query() coursePaginationDto:CoursePaginationDto) {
+  async findAll(@Query() coursePaginationDto: CoursePaginationDto) {
     return await this.courseService.findAll(coursePaginationDto);
   }
 
@@ -24,7 +33,7 @@ export class CourseController {
   }
 
   @Get('/list')
-  async listCourses() {
+  async getList() {
     return await this.courseService.listCourses();
   }
 

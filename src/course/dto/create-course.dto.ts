@@ -11,7 +11,7 @@ export class CreateCourseDto {
 
   @IsInt()
   @IsNotEmpty()
-  @Min(3)
+  @Min(1)
   unitValue: number; // numero de creditos 
 
   @IsInt()
