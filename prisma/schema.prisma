@@ -28,7 +28,8 @@ model Course {
   theoryHours   Int
   practiceHours Int
   status        CourseStatus @default(activo)
-  curriculum    Curriculum[] 
+  curriculum    Curriculum[]
+  Schedule      Schedule[]
 }
 
 enum CourseStatus {
@@ -45,4 +46,80 @@ model Curriculum {
   course Course @relation(fields: [courseId], references: [id])
 
   @@id([degreeId, courseId])
+}
+
+model AcademicPeriod {
+  id        String   @id @default(uuid())
+  year      Int
+  period    Int
+  startDate DateTime
+  endDate   DateTime
+
+  schedules Schedule[]
+}
+
+model Room {
+  id   String @id @default(uuid())
+  code String @db.VarChar(10)
+
+  schedules Schedule[]
+}
+
+model Schedule {
+  id               String         @id @default(uuid())
+  academicPeriodId String
+  academicPeriod   AcademicPeriod @relation(fields: [academicPeriodId], references: [id])
+
+  professorId String
+  professor   Professor @relation(fields: [professorId], references: [id])
+
+  courseId String
+  course   Course @relation(fields: [courseId], references: [id])
+
+  section String
+  roomId String
+  room   Room   @relation(fields: [roomId], references: [id])
+
+  events Event[]
+
+  @@index([academicPeriodId])
+  @@index([professorId])
+  @@index([roomId])
+  @@index([courseId])
+}
+
+
+
+model Event {
+  id         String @id @default(uuid())
+  scheduleId String
+  day        Int
+  startTime  Int // e.g., 700
+  endTime    Int // e.g., 1300
+
+  schedule Schedule @relation(fields: [scheduleId], references: [id])
+
+  @@index([scheduleId])
+}
+
+model Professor {
+  id          String          @id @default(uuid())
+  code        String          @unique @db.VarChar(20)
+  firstName   String          @db.VarChar(50)
+  lastName    String          @db.VarChar(50)
+  email       String          @unique
+  phoneNumber String          @db.VarChar(20)
+  status      ProfessorStatus @default(activo)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  Schedule    Schedule[]
+
+  @@index([code, status])
+}
+
+enum ProfessorStatus {
+  activo
+  inactivo
+  jubilado
+  de_baja
 }
