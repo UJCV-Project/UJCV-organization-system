@@ -9,9 +9,11 @@ import {
   HttpCode,
   HttpStatus,
   ParseEnumPipe,
+  Delete,
+  Param,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { ApiQuery } from '@nestjs/swagger';
+import { ApiParam, ApiQuery } from '@nestjs/swagger';
 import { ScheduleService } from './schedule.service';
 import { CreateScheduleDto } from './dto/create-schedule.dto';
 import { GetScheduleDto } from './dto/get-schedule.dto';
@@ -68,5 +70,16 @@ export class ScheduleController {
   async getInitialData() {
     this.logger.log('Fetching initial schedule data');
     return this.scheduleService.getInitialData();
+  }
+  @ApiParam({ name: 'id'})
+  @Delete('id/:id')
+  async deleteSchedule(@Param('id') id: string){
+    return await this.scheduleService.deleteSchedule(id);
+  }
+  @ApiParam({ name: 'id'})
+  @Delete('event/:id')
+  async deleteEvent(@Param('id') id: string){
+    return await this.scheduleService.deleteEvent(id);
+    
   }
 }
