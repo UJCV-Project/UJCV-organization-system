@@ -30,6 +30,7 @@ services:
       POSTGRES_DB: classes
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - ./alldb_dump.sql:/docker-entrypoint-initdb.d/alldb_dump.sql
 
 volumes:
   pgdata:
