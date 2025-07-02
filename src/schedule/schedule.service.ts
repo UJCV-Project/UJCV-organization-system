@@ -22,51 +22,70 @@ export class ScheduleService {
   ) {}
 
   logger = new Logger('Schedule Service');
-  async create(createDto: CreateScheduleDto) {
-    const { academicPeriodId, professorId, roomId, events } = createDto;
+async create(createDto: CreateScheduleDto) {
+  const { academicPeriodId, professorId, roomId, courseId, section, events } = createDto;
 
-    for (const event of events) {
-      const overlappingEvents = await this.prisma.event.findMany({
-        where: {
-          day: event.day,
-          schedule: {
-            academicPeriodId,
-            OR: [{ professorId }, { roomId }],
-          },
-          AND: [
-            { startTime: { lt: event.endTime } },
-            { endTime: { gt: event.startTime } },
-          ],
-        },
-        include: { schedule: true },
-      });
+  for (const event of events) {
+    const orConditions: any[] = [];
 
-      if (overlappingEvents.length > 0) {
-        const conflict = overlappingEvents[0];
-        const isProfessorConflict =
-          conflict.schedule.professorId === professorId;
-        const conflictType = isProfessorConflict ? 'professor' : 'room';
-
-        throw new BadRequestException(
-          `Scheduling conflict: The ${conflictType} is already assigned on ${event.day} from ${conflict.startTime} to ${conflict.endTime}.`,
-        );
-      }
-    }
-
-    return this.prisma.schedule.create({
-      data: {
+    // Always check professor conflict
+    orConditions.push({
+      schedule: {
         academicPeriodId,
         professorId,
-        courseId: createDto.courseId,
-        roomId,
-        section: createDto.section,
-        events: {
-          create: events,
-        },
       },
-      include: { events: true },
     });
+
+    //! Check room conflict only if not VIRTUAL
+    //! ABSOLUTAMENTE BORRAR ESTO DESPUÉS
+    if (roomId !== '85fd59d4-51cb-4f04-81d9-10ca22c0cfd3') {
+      orConditions.push({
+        schedule: {
+          academicPeriodId,
+          roomId,
+        },
+      });
+    }
+
+    const overlappingEvents = await this.prisma.event.findMany({
+      where: {
+        day: event.day,
+        AND: [
+          { startTime: { lt: event.endTime } },
+          { endTime: { gt: event.startTime } },
+        ],
+        OR: orConditions,
+      },
+      include: { schedule: true },
+    });
+
+    if (overlappingEvents.length > 0) {
+      const conflict = overlappingEvents[0];
+      const isProfessorConflict = conflict.schedule.professorId === professorId;
+      const conflictType = isProfessorConflict ? 'professor' : 'room';
+
+      throw new BadRequestException(
+        `Scheduling conflict: The ${conflictType} is already assigned on day ${event.day} from ${conflict.startTime} to ${conflict.endTime}.`,
+      );
+    }
   }
+
+  // Insert schedule and events atomically
+  return this.prisma.schedule.create({
+    data: {
+      academicPeriodId,
+      professorId,
+      courseId,
+      roomId,
+      section,
+      events: {
+        create: events,
+      },
+    },
+    include: { events: true },
+  });
+}
+
 
   async getSchedules(query: GetScheduleDto) {
     const academicPeriod = query.academicPeriodId
@@ -103,6 +122,7 @@ export class ScheduleService {
       day: event.day,
       startTime: event.startTime,
       endTime: event.endTime,
+      scheduleId: event.scheduleId,
       courseId: event.schedule.courseId,
       courseCode: event.schedule.course.code,
       courseName: event.schedule.course.name,
@@ -113,12 +133,12 @@ export class ScheduleService {
       roomCode: event.schedule.room.code,
     }));
 
-    return { data: {academicPeriod: {...academicPeriod.data, events}}};
+    return { data: { academicPeriod: { ...academicPeriod.data, events } } };
   }
-  
+
   async getScheduleGroupedBy(groupBy: GROUP_BY, query: GetScheduleDto) {
     const schedule = (await this.getSchedules(query)).data;
-    const {events, ...academicPeriod} = schedule.academicPeriod;
+    const { events, ...academicPeriod } = schedule.academicPeriod;
 
     const grouped = events.reduce(
       (acc, event) => {
@@ -135,10 +155,29 @@ export class ScheduleService {
       {} as Record<string, typeof events>,
     );
 
-    return { data: {academicPeriod: {...academicPeriod, events: grouped}}};
+    return { data: { academicPeriod: { ...academicPeriod, events: grouped } } };
   }
 
-  
+  async deleteSchedule(id: string) {
+    await this.prisma.event.deleteMany({
+      where: { scheduleId: id },
+    });
+
+    const deletedSchedule = await this.prisma.schedule.delete({
+      where: { id },
+    });
+
+    return deletedSchedule;
+  }
+
+  async deleteEvent(id: string) {
+    const deletedEvent = await this.prisma.event.delete({
+      where: { id },
+    });
+
+    return deletedEvent;
+  }
+
   async getInitialData() {
     const professorsRes = await this.professorService.getListProfessor();
     const coursesRes = await this.courseService.listCourses();
@@ -158,9 +197,7 @@ export class ScheduleService {
 
   /*Maybe separate this logic*/
 
-  async exportScheduleGridToExcel(
-    data: any
-  ): Promise<Buffer> {
+  async exportScheduleGridToExcel(data: any): Promise<Buffer> {
     const schedules: Record<string, any[]> = data.academicPeriod.events;
     const groupBy = 'Aula';
     const workbook = new ExcelJS.Workbook();

@@ -14,8 +14,7 @@ async function bootstrap() {
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);
 
-  //!Change Later
-  app.enableCors();
+  app.enableCors('172.17.11.65:5173');
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
 
   logger.log(`Class Microservice running on port ${envs.port}`);
