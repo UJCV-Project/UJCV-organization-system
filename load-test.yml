@@ -1,0 +1,10 @@
+config:
+  target: "http://localhost:17504"
+  phases:
+    - duration: 60       # Run for 60 seconds
+      arrivalRate: 10    # 10 new VUs (virtual users) per second
+
+scenarios:
+  - flow:
+      - get:
+          url: "/professors"

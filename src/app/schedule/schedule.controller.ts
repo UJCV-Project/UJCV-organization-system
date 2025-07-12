@@ -6,8 +6,6 @@ import {
   Query,
   Logger,
   Res,
-  HttpCode,
-  HttpStatus,
   ParseEnumPipe,
   Delete,
   Param,
@@ -18,6 +16,7 @@ import { ScheduleService } from './schedule.service';
 import { CreateScheduleDto } from './dto/create-schedule.dto';
 import { GetScheduleDto } from './dto/get-schedule.dto';
 import { GROUP_BY } from './enums/groupBy.enum';
+import { exportScheduleGridToExcel } from './schedule-excel';
 
 @Controller('schedule')
 export class ScheduleController {
@@ -26,9 +25,7 @@ export class ScheduleController {
   constructor(private readonly scheduleService: ScheduleService) {}
 
   @Post()
-  @HttpCode(HttpStatus.CREATED)
-  async createSchedule(@Body() createScheduleDto: CreateScheduleDto) {
-    this.logger.log('Creating new schedule entry');
+  createSchedule(@Body() createScheduleDto: CreateScheduleDto) {
     return this.scheduleService.create(createScheduleDto);
   }
 
@@ -36,6 +33,8 @@ export class ScheduleController {
   async getSchedules(@Query() getScheduleDto: GetScheduleDto) {
     return this.scheduleService.getSchedules(getScheduleDto);
   }
+
+
   @ApiQuery({ name: 'groupBy', enum: GROUP_BY })
   @Get('group')
   async getGroupedSchedules(
@@ -47,13 +46,11 @@ export class ScheduleController {
 
   @Get('export')
   async exportSchedulesToExcel(@Res() res: Response): Promise<void> {
-
     const { data } = await this.scheduleService.getScheduleGroupedBy(
       GROUP_BY.ROOM,
       {},
     );
-    const excelBuffer =
-      await this.scheduleService.exportScheduleGridToExcel(data);
+    const excelBuffer = await exportScheduleGridToExcel(data);
 
     res.setHeader(
       'Content-Type',
@@ -71,15 +68,14 @@ export class ScheduleController {
     this.logger.log('Fetching initial schedule data');
     return this.scheduleService.getInitialData();
   }
-  @ApiParam({ name: 'id'})
+  @ApiParam({ name: 'id' })
   @Delete('id/:id')
-  async deleteSchedule(@Param('id') id: string){
+  async deleteSchedule(@Param('id') id: string) {
     return await this.scheduleService.deleteSchedule(id);
   }
-  @ApiParam({ name: 'id'})
+  @ApiParam({ name: 'id' })
   @Delete('event/:id')
-  async deleteEvent(@Param('id') id: string){
+  async deleteEvent(@Param('id') id: string) {
     return await this.scheduleService.deleteEvent(id);
-    
   }
 }

@@ -1,26 +1,19 @@
 services:
   api:
-    image: node:18
-    restart: unless-stopped
+    build: .
     ports:
       - "17504:3000"
     environment:
       - PORT=3000
-      - DATABASE_URL=postgresql://postgres:example@postgres:5432/classes?schema=public
+      - DATABASE_URL=postgresql://postgres:example@db:5432/classes?schema=public
     depends_on:
-      - postgres
+      - db
     volumes:
       - .:/app
-    #No se si esta parte puede mejorar
-    command: >
-      sh -c "
-        cd app
-        npm install &&
-        npm run start
-      "
+    restart: unless-stopped
     
 
-  postgres:
+  db:
     image: postgres:15
     restart: always
     ports:

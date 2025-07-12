@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { SelectOption } from 'src/common/select-option';
 
 @Injectable()
 export class RoomService {
@@ -11,12 +12,12 @@ export class RoomService {
     return savedRoom;
   }
 
-  async getRoomList() {
+  async selectOptions(): Promise<{data: SelectOption[]}> {
     const roomList = await this.prisma.room.findMany({orderBy:{code:'asc'}})
-    const formattedList = roomList.map(({ id, code }) => ({
-      id,
-      text: code,
+    const formattedList: SelectOption[] = roomList.map(({ id, code }) => ({
+      value: id,
+      label: code,
     }));
-    return {data:formattedList}
+    return {data:formattedList};
   }
 }

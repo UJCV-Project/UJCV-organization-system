@@ -11,8 +11,8 @@ export class RoomController {
     return this.roomService.create(createRoomDto);
   }
 
-  @Get('/list')
-  getRoomList() {
-    return this.roomService.getRoomList();
+  @Get('/select-options')
+  selectOptions() {
+    return this.roomService.selectOptions();
   }
 }
