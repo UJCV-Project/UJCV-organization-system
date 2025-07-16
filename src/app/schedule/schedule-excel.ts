@@ -27,9 +27,9 @@ export async function exportScheduleGridToExcel(data: any): Promise<Buffer> {
       };
     });
 
-    this.generateScheduleTable(sheet, events);
+    generateScheduleTable(sheet, events);
   }
-  this.mergeScheduleCells(sheet);
+  mergeScheduleCells(sheet);
 
   // Adjust column widths
   sheet.getColumn(1).width = 12; // Time column
@@ -42,7 +42,7 @@ export async function exportScheduleGridToExcel(data: any): Promise<Buffer> {
 }
 
 function generateScheduleTable(sheet: ExcelJS.Worksheet, events: any[]) {
-  const timeSlots = this.generateTimeSlots(700, 2100, 100);
+  const timeSlots = generateTimeSlots(700, 2100, 100);
   const numColumns = 7;
 
   timeSlots.forEach((time, i) => {
@@ -62,7 +62,7 @@ function generateScheduleTable(sheet: ExcelJS.Worksheet, events: any[]) {
       });
 
       const excelRow = sheet.addRow(timeRow);
-      this.designScheduleTable(excelRow);
+      designScheduleTable(excelRow);
     }
   });
 }

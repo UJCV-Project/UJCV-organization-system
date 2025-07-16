@@ -107,7 +107,7 @@ export class ScheduleService {
       include: {
         schedule: {
           include: {
-            room: { select: { code: true } },
+            room: { select: { name: true } },
             professor: {
               select: { id: true, firstName: true, lastName: true },
             },
@@ -130,7 +130,7 @@ export class ScheduleService {
       professorId: event.schedule.professorId,
       professorName: `${event.schedule.professor.firstName} ${event.schedule.professor.lastName}`,
       roomId: event.schedule.roomId,
-      roomCode: event.schedule.room.code,
+      roomCode: event.schedule.room.name,
     }));
 
     return { data: { academicPeriod: academicPeriod.data, events } };

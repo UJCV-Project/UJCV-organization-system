@@ -8,6 +8,7 @@ import { AcademicPeriodModule } from './app/academic-period/academic-period.modu
 import { RoomModule } from './app/room/room.module';
 import { ProfessorModule } from './app/professor/professor.module';
 import { ScheduleModule } from './app/schedule/schedule.module';
+import { AvailabilityModule } from './app/availability/availability.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { ScheduleModule } from './app/schedule/schedule.module';
     RoomModule,
     ProfessorModule,
     ScheduleModule,
+    AvailabilityModule,
   ],
   providers: [PrismaService],
 })

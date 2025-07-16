@@ -1,4 +1,4 @@
 export enum ProfessorStatus {
-    ACTIVO = 'activo',
-    INACTIVO = 'inactivo'
+    ACTIVO = 'Activo',
+    INACTIVO = 'Inactivo'
 }

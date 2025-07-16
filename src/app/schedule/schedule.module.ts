@@ -11,5 +11,6 @@ import { ProfessorModule } from 'src/app/professor/professor.module';
   imports: [PrismaModule, RoomModule, AcademicPeriodModule, CourseModule, ProfessorModule],
   controllers: [ScheduleController],
   providers: [ScheduleService],
+  exports:[ScheduleService],
 })
 export class ScheduleModule { }
