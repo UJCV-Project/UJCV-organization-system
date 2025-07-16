@@ -7,17 +7,25 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Professor {
+  id          String     @id @default(uuid())
+  code        String     @unique @db.VarChar(20)
+  firstName   String     @db.VarChar(50)
+  lastName    String     @db.VarChar(50)
+  email       String     @unique
+  phoneNumber String     @db.VarChar(20)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  status      String     @default("Activo") @db.VarChar(10)
+  schedule    Schedule[]
+}
+
 model Degree {
   id         String       @id @default(uuid())
   code       String       @unique
   name       String
   status     DegreeStatus @default(activo)
   curriculum Curriculum[]
-}
-
-enum DegreeStatus {
-  activo
-  inactivo
 }
 
 model Course {
@@ -32,55 +40,48 @@ model Course {
   Schedule      Schedule[]
 }
 
-enum CourseStatus {
-  activo
-  inactivo
-}
-
 model Curriculum {
   degreeId String
   courseId String
   semester Int?
-
-  degree Degree @relation(fields: [degreeId], references: [id])
-  course Course @relation(fields: [courseId], references: [id])
+  course   Course @relation(fields: [courseId], references: [id])
+  degree   Degree @relation(fields: [degreeId], references: [id])
 
   @@id([degreeId, courseId])
 }
 
 model AcademicPeriod {
-  id        String   @id @default(uuid())
+  id        String     @id @default(uuid())
   year      Int
   period    Int
   startDate DateTime
   endDate   DateTime
-
   schedules Schedule[]
 }
 
 model Room {
-  id   String @id @default(uuid())
-  code String @db.VarChar(10)
-
+  id        String     @id @default(uuid())
+  name      String     @db.VarChar(30)
+  room_type String     @db.VarChar(30)
+  capacity  Int        @db.SmallInt
+  building  String     @db.VarChar(30)
+  floor     Int        @db.SmallInt
+  equipment String?    @default("") @db.VarChar
   schedules Schedule[]
 }
 
 model Schedule {
   id               String         @id @default(uuid())
   academicPeriodId String
+  professorId      String
+  courseId         String
+  roomId           String
+  section          String
+  events           Event[]
   academicPeriod   AcademicPeriod @relation(fields: [academicPeriodId], references: [id])
-
-  professorId String
-  professor   Professor @relation(fields: [professorId], references: [id])
-
-  courseId String
-  course   Course @relation(fields: [courseId], references: [id])
-
-  section String
-  roomId String
-  room   Room   @relation(fields: [roomId], references: [id])
-
-  events Event[]
+  course           Course         @relation(fields: [courseId], references: [id])
+  professor        Professor      @relation(fields: [professorId], references: [id])
+  room             Room           @relation(fields: [roomId], references: [id])
 
   @@index([academicPeriodId])
   @@index([professorId])
@@ -88,33 +89,25 @@ model Schedule {
   @@index([courseId])
 }
 
-
-
 model Event {
-  id         String @id @default(uuid())
+  id         String   @id @default(uuid())
   scheduleId String
   day        Int
-  startTime  Int // e.g., 700
-  endTime    Int // e.g., 1300
-
-  schedule Schedule @relation(fields: [scheduleId], references: [id])
+  startTime  Int
+  endTime    Int
+  schedule   Schedule @relation(fields: [scheduleId], references: [id])
 
   @@index([scheduleId])
 }
 
-model Professor {
-  id          String          @id @default(uuid())
-  code        String          @unique @db.VarChar(20)
-  firstName   String          @db.VarChar(50)
-  lastName    String          @db.VarChar(50)
-  email       String          @unique
-  phoneNumber String          @db.VarChar(20)
-  status      ProfessorStatus @default(activo)
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
-  Schedule    Schedule[]
+enum DegreeStatus {
+  activo
+  inactivo
+}
 
-  @@index([code, status])
+enum CourseStatus {
+  activo
+  inactivo
 }
 
 enum ProfessorStatus {
