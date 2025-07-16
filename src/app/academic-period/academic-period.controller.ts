@@ -10,19 +10,4 @@ export class AcademicPeriodController {
   create(@Body() createAcademicPeriodDto: CreateAcademicPeriodDto) {
     return this.academicPeriodService.create(createAcademicPeriodDto);
   }
-
-  @Get('id/:id')
-  getById(@Param() id: string){
-    return this.academicPeriodService.getById(id);
-  }
-
-  @Get('/list')
-  getList(){
-    return this.academicPeriodService.getList();
-  } 
-
-  @Get('/current')
-  getCurrent(){
-    return this.academicPeriodService.getCurrent();
-  }
 }

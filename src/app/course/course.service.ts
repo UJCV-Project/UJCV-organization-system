@@ -5,7 +5,7 @@ import {
   ConflictException,
   Logger,
 } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/utils/prisma/prisma.service';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
 import { CourseStatus } from './enum/course-status';
@@ -57,12 +57,42 @@ export class CourseService {
     });
     const lastPage = Math.ceil(totalPages / limit);
 
+    const rawData = await this.prisma.course.findMany({
+      skip: (page - 1) * limit,
+      take: limit,
+      where: whereConditions,
+      select: {
+        // Select all course fields
+        id: true,
+        name: true,
+        code: true,
+        unitValue: true,
+        status: true,
+        curriculum: {
+          select: {
+            degree: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const data = rawData.map((course) => {
+      // Extract degree names from curriculum array
+      const careers = course.curriculum.map((c) => c.degree.name);
+
+      return {
+        ...course,
+        careers,
+        curriculum: undefined, // optionally remove original curriculum
+      };
+    });
+
     return {
-      data: await this.prisma.course.findMany({
-        skip: (page - 1) * limit,
-        take: limit,
-        where: whereConditions,
-      }),
+      data: data,
       metadata: {
         total: totalPages,
         page: page,
@@ -97,7 +127,7 @@ export class CourseService {
       label: `${course.code} | ${course.name}`,
     }));
 
-    return {data: result};
+    return { data: result };
   }
 
   async update(id: string, updateCourseDto: UpdateCourseDto) {

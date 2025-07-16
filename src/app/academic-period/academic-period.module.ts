@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AcademicPeriodService } from './academic-period.service';
 import { AcademicPeriodController } from './academic-period.controller';
-import { PrismaModule } from 'src/prisma/prisma.module';
+import { PrismaModule } from 'src/utils/prisma/prisma.module';
 
 @Module({
   imports:[PrismaModule],

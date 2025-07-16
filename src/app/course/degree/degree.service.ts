@@ -1,7 +1,7 @@
 import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { CreateDegreeDto } from './dto/create-degree.dto';
 import { UpdateDegreeDto } from './dto/update-degree.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/utils/prisma/prisma.service';
 import { DegreeStatus, } from './enum/degree-status';
 import { DegreePaginationDto } from './dto/get-degree.dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';

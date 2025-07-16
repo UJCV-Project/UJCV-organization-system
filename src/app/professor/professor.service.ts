@@ -5,10 +5,10 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/utils/prisma/prisma.service';
 import { CreateProfessorDto, GetProfessorDto, UpdateProfessorDto } from './dto';
 import { ProfessorStatus } from './enums/professorStatus';
-import { SelectOption } from 'src/common/select-option';
+import { SelectOption } from 'src/common/types/select-option';
 
 @Injectable()
 export class ProfessorService {

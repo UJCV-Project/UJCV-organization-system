@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CreateCurriculumDto } from './dto/create-curriculum.dto';
 import { DeleteCurriculumDto } from './dto/delete-curriculum.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/utils/prisma/prisma.service';
 
 @Injectable()
 export class CurriculumService {

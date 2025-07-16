@@ -7,6 +7,35 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+//Professor Module
+model Professor {
+  id                String              @id @default(uuid())
+  code              String              @unique @db.VarChar(20)
+  firstName         String              @db.VarChar(50)
+  lastName          String              @db.VarChar(50)
+  email             String              @unique
+  phoneNumber       String              @db.VarChar(20)
+  status            String              @db.VarChar(20)
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  schedule          Schedule[]
+  availableSchedule AvailableSchedule[]
+
+  @@index([code, status])
+}
+
+model AvailableSchedule {
+  id          String @id @default(uuid())
+  professorId String
+  day         Int
+  startTime   Int
+  endTime     Int
+
+  professor Professor @relation(fields: [professorId], references: [id])
+
+  @@index([professorId])
+}
+
 model Degree {
   id         String       @id @default(uuid())
   code       String       @unique
@@ -77,8 +106,8 @@ model Schedule {
   course   Course @relation(fields: [courseId], references: [id])
 
   section String
-  roomId String
-  room   Room   @relation(fields: [roomId], references: [id])
+  roomId  String
+  room    Room   @relation(fields: [roomId], references: [id])
 
   events Event[]
 
@@ -87,8 +116,6 @@ model Schedule {
   @@index([roomId])
   @@index([courseId])
 }
-
-
 
 model Event {
   id         String @id @default(uuid())
@@ -100,26 +127,4 @@ model Event {
   schedule Schedule @relation(fields: [scheduleId], references: [id])
 
   @@index([scheduleId])
-}
-
-model Professor {
-  id          String          @id @default(uuid())
-  code        String          @unique @db.VarChar(20)
-  firstName   String          @db.VarChar(50)
-  lastName    String          @db.VarChar(50)
-  email       String          @unique
-  phoneNumber String          @db.VarChar(20)
-  status      ProfessorStatus @default(activo)
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
-  Schedule    Schedule[]
-
-  @@index([code, status])
-}
-
-enum ProfessorStatus {
-  activo
-  inactivo
-  jubilado
-  de_baja
 }

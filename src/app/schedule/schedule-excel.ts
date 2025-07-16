@@ -1,8 +1,8 @@
 import * as ExcelJS from 'exceljs';
 import {days} from 'src/common/days';
-
+import {formatTime} from 'src/common/formaters/time-format';
 export async function exportScheduleGridToExcel(data: any): Promise<Buffer> {
-  const schedules: Record<string, any[]> = data.academicPeriod.events;
+  const schedules: Record<string, any[]> = data.events;
   const groupBy = 'Aula';
   const workbook = new ExcelJS.Workbook();
   const sheet = workbook.addWorksheet(`Horario por ${groupBy}`);
@@ -48,7 +48,7 @@ function generateScheduleTable(sheet: ExcelJS.Worksheet, events: any[]) {
   timeSlots.forEach((time, i) => {
     if (timeSlots[i + 1]) {
       let timeRow: string[] = new Array(numColumns).fill('');
-      const label = `${this.formatTime(timeSlots[i])}-${this.formatTime(timeSlots[i + 1])}`;
+      const label = `${formatTime(timeSlots[i])}-${formatTime(timeSlots[i + 1])}`;
       timeRow[0] = label;
 
       //Find the schedule for each cell
@@ -148,8 +148,3 @@ function generateTimeSlots(start: number, end: number, step: number): number[] {
   return slots;
 }
 
-function formatTime(time: number): string {
-  const hours = Math.floor(time / 100);
-  const minutes = time % 100;
-  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-}

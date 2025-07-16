@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 
 import { CourseModule } from './app/course/course.module';
-import { PrismaService } from './prisma/prisma.service';
-import { DegreeModule } from './app/degree/degree.module';
-import { CurriculumModule } from './app/curriculum/curriculum.module';
+import { PrismaService } from './utils/prisma/prisma.service';
+import { DegreeModule } from './app/course/degree/degree.module';
+import { CurriculumModule } from './app/course/curriculum/curriculum.module';
 import { AcademicPeriodModule } from './app/academic-period/academic-period.module';
 import { RoomModule } from './app/room/room.module';
 import { ProfessorModule } from './app/professor/professor.module';

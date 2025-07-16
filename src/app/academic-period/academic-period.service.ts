@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { CreateAcademicPeriodDto } from './dto/create-academic-period.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from 'src/utils/prisma/prisma.service';
 import { envs } from 'src/config';
+import { SelectOption } from 'src/common/types/select-option';
 
 @Injectable()
 export class AcademicPeriodService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   async create(academicPeriodDatesDto: CreateAcademicPeriodDto) {
     const [lastAcademicPeriod] = await this.prisma.academicPeriod.findMany({
@@ -13,7 +14,10 @@ export class AcademicPeriodService {
       take: 1,
     });
 
-    const newAcademicPeriod = this.defineAcademicPeriod(academicPeriodDatesDto, lastAcademicPeriod);
+    const newAcademicPeriod = this.defineAcademicPeriod(
+      academicPeriodDatesDto,
+      lastAcademicPeriod,
+    );
 
     return this.prisma.academicPeriod.create({
       data: newAcademicPeriod,
@@ -39,7 +43,7 @@ export class AcademicPeriodService {
     };
   }
 
-  async getList() {
+  async selectOptions() {
     const academicPeriodList = await this.prisma.academicPeriod.findMany({
       select: {
         id: true,
@@ -49,10 +53,12 @@ export class AcademicPeriodService {
       orderBy: { startDate: 'desc' },
     });
 
-    const formattedList = academicPeriodList.map(({ id, year, period }) => ({
-      id,
-      text: `${year}-${period}`,
-    }));
+    const formattedList: SelectOption[] = academicPeriodList.map(
+      ({ id, year, period }) => ({
+        value: id,
+        label: `${year}-${period}`,
+      }),
+    );
 
     return { data: formattedList };
   }
@@ -73,14 +79,13 @@ export class AcademicPeriodService {
     return { data: currentAcademicPeriod };
   }
 
-    async getById(id: string) {
+  async find(id: string) {
     const academicPeriod = await this.prisma.academicPeriod.findFirst({
       where: {
-        id
+        id,
       },
       take: 1,
     });
     return { data: academicPeriod };
   }
-
 }
