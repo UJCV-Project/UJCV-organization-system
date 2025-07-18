@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body } from '@nestjs/common';
 import { RoomService } from './room.service';
 import { CreateRoomDto } from './dto/create-room.dto';
 
-@Controller('room')
+@Controller('rooms')
 export class RoomController {
   constructor(private readonly roomService: RoomService) {}
 
@@ -11,8 +11,13 @@ export class RoomController {
     return this.roomService.create(createRoomDto);
   }
 
-  @Get('/select-options')
+  @Get('options')
   selectOptions() {
     return this.roomService.selectOptions();
+  }
+
+  @Get('available')
+  getAvailableRooms(){
+    return this.roomService.getAvailableRooms();
   }
 }

@@ -1,22 +1,14 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { CreateScheduleDto } from './dto/create-schedule.dto';
 import { GetScheduleDto } from './dto/get-schedule.dto';
-import { RoomService } from 'src/app/room/room.service';
 import { AcademicPeriodService } from 'src/app/academic-period/academic-period.service';
-import { CourseService } from 'src/app/course/course.service';
-import { ProfessorService } from 'src/app/professor/professor.service';
 import { PrismaService } from 'src/utils/prisma/prisma.service';
-import { Sections } from 'src/common/sections';
 import { GROUP_BY } from './enums/groupBy.enum';
-import { SelectOption } from 'src/common/types/select-option';
 
 @Injectable()
 export class ScheduleService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly courseService: CourseService,
-    private readonly professorService: ProfessorService,
-    private readonly roomService: RoomService,
     private readonly academicPeriodService: AcademicPeriodService,
   ) {}
 
@@ -87,9 +79,9 @@ export class ScheduleService {
     });
   }
 
-  async get(query: GetScheduleDto) {
+  async getSchedules(query: GetScheduleDto) {
     const academicPeriod = query.academicPeriodId
-      ? await this.academicPeriodService.find(query.academicPeriodId)
+      ? await this.academicPeriodService.getPeriodById(query.academicPeriodId)
       : await this.academicPeriodService.getCurrent();
 
     const academicPeriodId = academicPeriod.data?.id;
@@ -137,7 +129,7 @@ export class ScheduleService {
   }
 
   async groupBy(groupBy: GROUP_BY, query: GetScheduleDto) {
-    const schedule = (await this.get(query)).data;
+    const schedule = (await this.getSchedules(query)).data;
     const { events, academicPeriod } = schedule;
 
     const grouped = events.reduce(
@@ -156,6 +148,24 @@ export class ScheduleService {
     );
 
     return { data: { academicPeriod: { ...academicPeriod, events: grouped } } };
+  }
+
+  async getCurrentEvents(){
+    const now = new Date();
+    const currentDay = now.getDay();
+    const currentTime = now.getHours() * 100 + now.getMinutes();
+
+    const currentSchedule = (await this.getSchedules({})).data;
+
+    const currentEvents = currentSchedule.events.filter((event) => {
+      return (
+        event.day === currentDay &&
+        event.startTime <= currentTime &&
+        currentTime < event.endTime
+      );
+    });
+
+    return {data: currentEvents};
   }
 
   async deleteSchedule(id: string) {
@@ -178,29 +188,4 @@ export class ScheduleService {
     return deletedEvent;
   }
 
-  async getInitialData() {
-    const [professorRes, courseRes, roomRes] = await Promise.all([
-      this.professorService.selectOptions(),
-      this.courseService.selectOptions(),
-      this.roomService.selectOptions(),
-    ]);
-
-    const professorSelectOptions: SelectOption[] = professorRes.data;
-    const courseSelectOptions: SelectOption[] = courseRes.data;
-    const roomSelectOptions: SelectOption[] = roomRes.data;
-
-    const sectionSelectOptions: SelectOption[] = Object.entries(Sections).map(
-      ([key, value]) => ({
-        value: key,
-        label: value,
-      }),
-    );
-
-    return {
-      professors: professorSelectOptions,
-      courses: courseSelectOptions,
-      rooms: roomSelectOptions,
-      sections: sectionSelectOptions,
-    };
-  }
 }

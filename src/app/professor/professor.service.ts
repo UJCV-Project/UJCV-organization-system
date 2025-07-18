@@ -9,10 +9,17 @@ import { PrismaService } from 'src/utils/prisma/prisma.service';
 import { CreateProfessorDto, GetProfessorDto, UpdateProfessorDto } from './dto';
 import { ProfessorStatus } from './enums/professorStatus';
 import { SelectOption } from 'src/common/types/select-option';
+import { ScheduleService } from '../schedule/schedule.service';
+import { ProfessorActivity } from './enums/professorActivity';
+import { formatTime } from 'src/common/formaters/time-format';
+import { days } from 'src/common/days';
 
 @Injectable()
 export class ProfessorService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private schedule: ScheduleService,
+  ) {}
 
   async create(data: CreateProfessorDto) {
     try {
@@ -30,45 +37,152 @@ export class ProfessorService {
     }
   }
 
-  async get(professorPagination: GetProfessorDto) {
-    const { page = 1, limit = 10, ...conditions } = professorPagination;
 
-    const totalPages = await this.prisma.professor.count({ where: conditions });
-    const lastPage = Math.ceil(totalPages / limit);
+  //! Name doesn't filter, not implemented yet
+  async getProfessors(professorPagination: GetProfessorDto) {
+    const {
+      page = 1,
+      limit = 10,
+      activity,
+      ...conditions
+    } = professorPagination;
+
+    let professorFilter: any = { ...conditions };
+
+    if (activity) {
+      const filteredIds = await this.filterProfessorActivity(activity);
+      if (filteredIds.length > 0) {
+        professorFilter.id = { in: filteredIds };
+      } else {
+        return {
+          data: [],
+          metadata: { total: 0, page, lastPage: 0 },
+        };
+      }
+    }
+
+    const total = await this.prisma.professor.count({ where: professorFilter });
+    const lastPage = Math.ceil(total / limit);
+
+    const rawData = await this.prisma.professor.findMany({
+      where: professorFilter,
+      skip: (page - 1) * limit,
+      take: limit,
+      include: {
+        schedule: {
+          select: {
+            id: true,
+            section: true,
+            course: { select: { name: true } },
+            room: { select: { name: true, capacity: true } },
+            events: {
+              select: { day: true, startTime: true, endTime: true },
+            },
+          },
+        },
+        available: { select: { day: true, startTime: true, endTime: true } },
+      },
+    });
+
+    const data = rawData.map((prof) => ({
+      id: prof.id,
+      name: `${prof.firstName} ${prof.lastName}`,
+      email: prof.email,
+      schedule: prof.schedule.map((s) => {
+        const timeSlots = s.events.map((event) => {
+          const day = days[event.day] ?? `Día ${event.day}`;
+          const start = formatTime(event.startTime);
+          const end = formatTime(event.endTime);
+          return `${day} ${start} - ${end}`;
+        });
+
+        return {
+          id: s.id,
+          course_name: s.course.name,
+          section: s.section,
+          room_name: s.room.name,
+          students: s.room.capacity, //!This currently is not students but rather capacity
+          time_slots: timeSlots,
+        };
+      }),
+
+      //TODO: Might want to check this later
+      available: prof.available.map((slot) => ({
+        day: days[slot.day] ?? `Día ${slot.day}`,
+        start: formatTime(slot.startTime),
+        end: formatTime(slot.endTime),
+      })),
+    }));
 
     return {
-      data: await this.prisma.professor.findMany({
-        skip: (page - 1) * limit,
-        take: limit,
-        where: conditions,
-      }),
-      metadata: {
-        total: totalPages,
-        page: page,
-        lastPage: lastPage,
-      },
+      data,
+      metadata: { total, page, lastPage },
     };
   }
 
-  async find(id: string) {
-    const data = await this.prisma.professor.findUnique({
-      where: { id },
+  async find(professorId: string) {
+    const rawData = await this.prisma.professor.findUnique({
+      where: { id: professorId },
+      include: {
+        schedule: {
+          select: {
+            id: true,
+            section: true,
+            course: { select: { name: true } },
+            room: { select: { name: true, capacity: true } },
+            events: {
+              select: { day: true, startTime: true, endTime: true },
+            },
+          },
+        },
+        available: { select: { day: true, startTime: true, endTime: true } },
+      },
     });
 
-    if (data === null) {
+    if (rawData === null) {
       const response = {
-        message: `No se ha encontrado ningún profesor con el código ${id}`,
+        message: `No se ha encontrado ningún profesor con el código ${professorId}`,
         error: 'No hay registro',
         statusCode: HttpStatus.NOT_FOUND,
       };
       throw new NotFoundException({ response });
     }
 
+    const data = {
+      id: rawData.id,
+      name: `${rawData.firstName} ${rawData.lastName}`,
+      email: rawData.email,
+      schedule: rawData.schedule.map((s) => {
+        const timeSlots = s.events.map((event) => {
+          const day = days[event.day] ?? `Día ${event.day}`;
+          const start = formatTime(event.startTime);
+          const end = formatTime(event.endTime);
+          return `${day} ${start} - ${end}`;
+        });
+
+        return {
+          id: s.id,
+          course_name: s.course.name,
+          section: s.section,
+          room_name: s.room.name,
+          students: s.room.capacity, //!This currently is not students but rather capacity
+          time_slots: timeSlots,
+        };
+      }),
+
+      //TODO: Might want to check this later
+      available: rawData.available.map((slot) => ({
+        day: days[slot.day] ?? `Día ${slot.day}`,
+        start: formatTime(slot.startTime),
+        end: formatTime(slot.endTime),
+      })),
+    };
+
     const result = { data };
     return result;
   }
 
-  async selectOptions(): Promise<{data:SelectOption[]}> {
+  async selectOptions(): Promise<{ data: SelectOption[] }> {
     const rawProfessors = await this.prisma.professor.findMany({
       where: { status: ProfessorStatus.ACTIVO },
       select: {
@@ -95,7 +209,7 @@ export class ProfessorService {
       });
       return result;
     } catch (error) {
-        throw new InternalServerErrorException(error.message);
+      throw new InternalServerErrorException(error.message);
     }
   }
 
@@ -105,5 +219,45 @@ export class ProfessorService {
       where: { id },
       data: { status: ProfessorStatus.INACTIVO },
     });
+  }
+
+  async filterProfessorActivity(
+    activity: ProfessorActivity,
+  ): Promise<string[]> {
+    const now = new Date();
+    const day = now.getDay();
+    const minutes = now.getHours() * 60 + now.getMinutes();
+
+    const currentEvents = (await this.schedule.getCurrentEvents()).data;
+    const teachingIds = new Set(currentEvents.map((e) => e.professorId));
+
+    if (activity === ProfessorActivity.TEACHING) {
+      return [...teachingIds];
+    }
+
+    const availableNow = await this.prisma.professorAvailableSlots.findMany({
+      where: {
+        day,
+        startTime: { lte: minutes },
+        endTime: { gt: minutes },
+      },
+      select: { professorId: true },
+    });
+
+    const availableIds = new Set(availableNow.map((a) => a.professorId));
+
+    if (activity === ProfessorActivity.AVAILABLE) {
+      return [...availableIds].filter((id) => !teachingIds.has(id));
+    }
+
+    if (activity === ProfessorActivity.UNAVAILABLE) {
+      const allProfessors = await this.prisma.professor.findMany({
+        select: { id: true },
+        where: { id: { notIn: [...availableIds] } },
+      });
+      return allProfessors.map((p) => p.id);
+    }
+
+    return [];
   }
 }

@@ -43,6 +43,11 @@ export class AcademicPeriodService {
     };
   }
 
+  async getAllPeriods(){
+    const periods = await this.prisma.academicPeriod.findMany({});
+    return {data: periods}
+  }
+
   async selectOptions() {
     const academicPeriodList = await this.prisma.academicPeriod.findMany({
       select: {
@@ -79,10 +84,10 @@ export class AcademicPeriodService {
     return { data: currentAcademicPeriod };
   }
 
-  async find(id: string) {
+  async getPeriodById(periodId: string) {
     const academicPeriod = await this.prisma.academicPeriod.findFirst({
       where: {
-        id,
+        id: periodId,
       },
       take: 1,
     });

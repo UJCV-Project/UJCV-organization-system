@@ -13,7 +13,7 @@ import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
 import { CoursePaginationDto } from './dto/get-course.dto';
 
-@Controller('course')
+@Controller('subjects')
 export class CourseController {
   constructor(private readonly courseService: CourseService) {}
 

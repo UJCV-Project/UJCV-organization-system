@@ -5,7 +5,7 @@ import { PrismaModule } from 'src/utils/prisma/prisma.module';
 import { ScheduleModule } from '../schedule/schedule.module';
 
 @Module({
-  imports:[PrismaModule],
+  imports:[PrismaModule,ScheduleModule],
   controllers: [RoomController],
   providers: [RoomService],
   exports:[RoomService]

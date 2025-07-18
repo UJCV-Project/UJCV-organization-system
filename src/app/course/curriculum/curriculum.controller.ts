@@ -3,7 +3,7 @@ import { CurriculumService } from './curriculum.service';
 import { CreateCurriculumDto } from './dto/create-curriculum.dto';
 import { DeleteCurriculumDto } from './dto/delete-curriculum.dto';
 
-@Controller('curriculum')
+@Controller('pensums')
 export class CurriculumController {
   constructor(private readonly curriculumService: CurriculumService) {}
 
@@ -12,11 +12,12 @@ export class CurriculumController {
     return this.curriculumService.create(createCurriculumDto);
   }
 
-  @Get('/:degreeId')
-  async findAll(@Param('degreeId') degreeId: string) {
-    return await this.curriculumService.findDegreeCoursesBySemester(degreeId);
+  @Get('/careers/:careerId')
+  async findAll(@Param('careerId') careerId: string) {
+    return await this.curriculumService.findDegreeCoursesBySemester(careerId);
   }
 
+  //!Rewrite this
   @Delete()
   remove(@Query() deleteCurriculumDto: DeleteCurriculumDto) {
     return this.curriculumService.remove(deleteCurriculumDto);

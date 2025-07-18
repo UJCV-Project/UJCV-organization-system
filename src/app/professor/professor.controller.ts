@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post,Delete, Patch, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post,Delete, Patch, Query, NotImplementedException } from '@nestjs/common';
 import { ProfessorService } from './professor.service';
 import { CreateProfessorDto, GetProfessorDto, UpdateProfessorDto } from './dto';
 
@@ -6,6 +6,7 @@ import { CreateProfessorDto, GetProfessorDto, UpdateProfessorDto } from './dto';
 export class ProfessorController {
   constructor(private readonly service: ProfessorService) {}
 
+  /* CRUD */
   @Post()
   async create(@Body() dto: CreateProfessorDto) {
     return await this.service.create(dto);
@@ -13,21 +14,21 @@ export class ProfessorController {
 
   @Get()
   async getAll(@Query() professorPagination: GetProfessorDto) {
-    return await this.service.get(professorPagination);
+    return await this.service.getProfessors(professorPagination);
   }
 
-  @Get(':id')
-  find(@Param('id') id: string) {
-    return this.service.find(id);
+  @Get(':professorId')
+  find(@Param('professorId') professorId: string) {
+    return this.service.find(professorId);
   }
 
-  @Patch(':id')
-  update(@Body() updateProfessorByCode:UpdateProfessorDto, @Param('id') id: string) {
-    return this.service.update(id, updateProfessorByCode);
+  @Patch(':professorId')
+  update(@Body() updateProfessorByCode:UpdateProfessorDto, @Param('professorId') professorId: string) {
+    return this.service.update(professorId, updateProfessorByCode);
   }
 
-  @Delete(':id')
-  delete(@Param('id') id: string) {
-    return this.service.delete(id);
+  @Delete(':professorId')
+  delete(@Param('professorId') professorId: string) {
+    return this.service.delete(professorId);
   }
 }

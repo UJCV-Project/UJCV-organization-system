@@ -4,7 +4,7 @@ import { CreateDegreeDto } from './dto/create-degree.dto';
 import { UpdateDegreeDto } from './dto/update-degree.dto';
 import { DegreePaginationDto } from './dto/get-degree.dto';
 
-@Controller('degree')
+@Controller('careers')
 export class DegreeController {
   constructor(private readonly degreeService: DegreeService) {}
 
@@ -18,12 +18,12 @@ export class DegreeController {
     return await this.degreeService.findAll(degreePagination);
   }
 
-  @Get('id/:id')
+  @Get(':id')
   findOne(@Param('id') id: string) {
     return this.degreeService.findById(id); 
   }
 
-  @Get('/list')
+  @Get('/options')
   async listDegree() {
     return await this.degreeService.listDegree();
   }

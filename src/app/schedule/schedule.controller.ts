@@ -4,21 +4,20 @@ import {
   Post,
   Body,
   Query,
-  Logger,
   Res,
   ParseEnumPipe,
   Delete,
   Param,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { ApiParam, ApiQuery } from '@nestjs/swagger';
+import { ApiQuery } from '@nestjs/swagger';
 import { ScheduleService } from './schedule.service';
 import { CreateScheduleDto } from './dto/create-schedule.dto';
 import { GetScheduleDto } from './dto/get-schedule.dto';
 import { GROUP_BY } from './enums/groupBy.enum';
 import { exportScheduleGridToExcel } from './schedule-excel';
 
-@Controller('schedule')
+@Controller('schedules')
 export class ScheduleController {
   constructor(private readonly scheduleService: ScheduleService) {}
   
@@ -28,12 +27,18 @@ export class ScheduleController {
   }
 
   @Get()
-  async get(@Query() getScheduleDto: GetScheduleDto) {
-    return this.scheduleService.get(getScheduleDto);
+  async getSchedules(@Query() getScheduleDto: GetScheduleDto) {
+    return this.scheduleService.getSchedules(getScheduleDto);
+  }
+
+  @Get('events/now')
+  async getCurrentEvents(@Query() getScheduleDto: GetScheduleDto) {
+    return this.scheduleService.getCurrentEvents();
   }
 
   @ApiQuery({ name: 'groupBy', enum: GROUP_BY })
-  @Get('group')
+  //!This needs a review
+  @Get('groups')
   async getGroupedSchedules(
     @Query('groupBy', new ParseEnumPipe(GROUP_BY)) groupBy: GROUP_BY,
     @Query() getScheduleDto: GetScheduleDto,
@@ -41,21 +46,19 @@ export class ScheduleController {
     return this.scheduleService.groupBy(groupBy, getScheduleDto);
   }
 
-  @Delete(':id')
-  async deleteSchedule(@Param('id') id: string) {
+  @Delete(':scheduleId')
+  async deleteSchedule(@Param('scheduleId') id: string) {
     return await this.scheduleService.deleteSchedule(id);
   }
 
-  @Delete('event/:id')
+  //!This needs a review
+  @Delete(':scheduleId/events/:eventId')
   async deleteEvent(@Param('id') id: string) {
     return await this.scheduleService.deleteEvent(id);
   }
 
-  @Get('form-data')
-  async getInitialData() {
-    return this.scheduleService.getInitialData();
-  }
 
+  //?Maybe to change this as a POST
   @Get('export')
   async export(@Res() res: Response, @Query() getScheduleDto: GetScheduleDto,): Promise<void> {
     const filename = "horario.xlsx"
