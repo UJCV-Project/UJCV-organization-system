@@ -1,8 +1,10 @@
 import * as ExcelJS from 'exceljs';
 import {days} from 'src/common/days';
 import {formatTime} from 'src/common/formaters/time-format';
+
+
 export async function exportScheduleGridToExcel(data: any): Promise<Buffer> {
-  const schedules: Record<string, any[]> = data.events;
+  const schedules: Record<string, any[]> = data.academicPeriod.events;
   const groupBy = 'Aula';
   const workbook = new ExcelJS.Workbook();
   const sheet = workbook.addWorksheet(`Horario por ${groupBy}`);

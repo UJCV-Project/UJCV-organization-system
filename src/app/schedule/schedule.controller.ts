@@ -60,7 +60,7 @@ export class ScheduleController {
 
   //?Maybe to change this as a POST
   @Get('export')
-  async export(@Res() res: Response, @Query() getScheduleDto: GetScheduleDto,): Promise<void> {
+  async export(@Res() res: Response, @Query() getScheduleDto: GetScheduleDto,) {
     const filename = "horario.xlsx"
     const { data } = await this.scheduleService.groupBy(
       GROUP_BY.ROOM,

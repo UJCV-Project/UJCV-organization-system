@@ -90,6 +90,7 @@ model Schedule {
   courseId         String
   roomId           String
   section          String
+  observations     String         @default("")
   events           Event[]
   academicPeriod   AcademicPeriod @relation(fields: [academicPeriodId], references: [id])
   course           Course         @relation(fields: [courseId], references: [id])
