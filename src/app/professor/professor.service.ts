@@ -232,7 +232,7 @@ export class ProfessorService {
     const teachingIds = new Set(currentEvents.map((e) => e.professorId));
 
     if (activity === ProfessorActivity.TEACHING) {
-      return [...teachingIds];
+      return teachingIds.size === 0 ? []: [...teachingIds];
     }
 
     const availableNow = await this.prisma.professorAvailableSlots.findMany({
@@ -247,7 +247,11 @@ export class ProfessorService {
     const availableIds = new Set(availableNow.map((a) => a.professorId));
 
     if (activity === ProfessorActivity.AVAILABLE) {
-      return [...availableIds].filter((id) => !teachingIds.has(id));
+      if(availableIds.size != 0){
+      return [...availableIds].filter((id) => !teachingIds.has(id)) as Array<any>;
+      }else{
+        return [];
+      }
     }
 
     if (activity === ProfessorActivity.UNAVAILABLE) {

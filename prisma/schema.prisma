@@ -7,6 +7,8 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
+/* Professor Schema */ 
 model Professor {
   id          String                    @id @default(uuid())
   code        String                    @unique @db.VarChar(20)
@@ -32,6 +34,9 @@ model ProfessorAvailableSlots {
   @@index([professorId, day])
   @@index([day, startTime])
 }
+
+
+/* Course Schema */ 
 
 model Degree {
   id         String       @id @default(uuid())
@@ -63,6 +68,7 @@ model Curriculum {
   @@id([degreeId, courseId])
 }
 
+
 model AcademicPeriod {
   id        String     @id @default(uuid())
   year      Int
@@ -74,11 +80,11 @@ model AcademicPeriod {
 
 model Room {
   id        String     @id @default(uuid())
-  name      String     @db.VarChar(30)
-  room_type String     @db.VarChar(30)
-  capacity  Int        @db.SmallInt
-  building  String     @db.VarChar(30)
-  floor     Int        @db.SmallInt
+  name      String     @default("") @db.VarChar(30)
+  room_type String     @default("") @db.VarChar(30)
+  capacity  Int        @default(0) @db.SmallInt
+  building  String     @default("") @db.VarChar(30)
+  floor     Int        @default(1) @db.SmallInt
   equipment String?    @default("") @db.VarChar
   schedules Schedule[]
 }
@@ -113,6 +119,50 @@ model Event {
 
   @@index([scheduleId])
 }
+
+
+
+
+/* Auth Schema*/
+
+model User {
+  userId        String        @id @default(uuid())  
+  email         String     @unique
+  passwordHash  String?    // Password hash (nullable for OAuth)
+  oauthProvider String?    // OAuth provider (nullable if not using OAuth)
+  oauthId       String?    
+  firstName     String     
+  lastName      String
+  picture       String?     
+  roleId        String        
+  role          Role       @relation(fields: [roleId], references: [roleId])  
+  createdAt     DateTime   @default(now())  
+  updatedAt     DateTime   @updatedAt 
+  lastLogin     DateTime?  
+}
+
+model Role {
+  roleId   String      @id @default(uuid())  
+  roleName String   @unique
+  description String?  
+  users    User[]   
+  permissions RolePermission[] 
+}
+
+model Permission {
+  permissionId   String      @id @default(uuid())  
+  permissionName String   @unique  // Name of the permission (e.g., "can_edit_schedule")
+  roles          RolePermission[]   
+}
+
+model RolePermission {
+  roleId        String
+  permissionId  String
+  role          Role       @relation(fields: [roleId], references: [roleId])
+  permission    Permission @relation(fields: [permissionId], references: [permissionId])
+  @@id([roleId, permissionId]) 
+}
+
 
 enum DegreeStatus {
   activo

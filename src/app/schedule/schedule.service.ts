@@ -157,7 +157,7 @@ export class ScheduleService {
 
     const currentSchedule = (await this.getSchedules({})).data;
 
-    const currentEvents = currentSchedule.events.filter((event) => {
+    const currentEvents: Array<any> = currentSchedule.events.filter((event) => {
       return (
         event.day === currentDay &&
         event.startTime <= currentTime &&
