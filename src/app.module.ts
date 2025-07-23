@@ -1,14 +1,17 @@
 import { Module } from '@nestjs/common';
 
-import { CourseModule } from './app/course/course.module';
-import { PrismaService } from './utils/prisma/prisma.service';
-import { DegreeModule } from './app/course/degree/degree.module';
-import { CurriculumModule } from './app/course/curriculum/curriculum.module';
+import { PrismaService } from './common/prisma/prisma.service';
+
+
+import { DegreeModule } from './app/course-ms/degree/degree.module';
+import { CurriculumModule } from './app/course-ms/curriculum/curriculum.module';
 import { AcademicPeriodModule } from './app/academic-period/academic-period.module';
 import { RoomModule } from './app/room/room.module';
 import { ProfessorModule } from './app/professor/professor.module';
-import { ScheduleModule } from './app/schedule/schedule.module';
-import { AvailabilityModule } from './app/availability/availability.module';
+import { AuthModule } from './auth/auth.module';
+import { CourseModule } from './app/course-ms/course/course.module';
+import { ScheduleModule } from './app/schedule-ms/schedule/schedule.module';
+import { ScheduleDiscussionModule } from './app/schedule-ms/schedule-discussion/schedule-discussion.module';
 
 @Module({
   imports: [
@@ -19,7 +22,8 @@ import { AvailabilityModule } from './app/availability/availability.module';
     RoomModule,
     ProfessorModule,
     ScheduleModule,
-    AvailabilityModule,
+    AuthModule,
+    ScheduleDiscussionModule,
   ],
   providers: [PrismaService],
 })

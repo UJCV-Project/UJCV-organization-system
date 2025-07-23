@@ -1,12 +1,15 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateRoomDto } from './dto/create-room.dto';
-import { PrismaService } from 'src/utils/prisma/prisma.service';
+import { PrismaService } from 'src/common/prisma/prisma.service';
 import { SelectOption } from 'src/common/types/select-option';
-import { ScheduleService } from '../schedule/schedule.service';
+import { ScheduleService } from '../schedule-ms/schedule/schedule.service';
 
 @Injectable()
 export class RoomService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly scheduleService: ScheduleService,
+  ) {}
 
   async create(createRoomDto: CreateRoomDto) {
     const savedRoom = await this.prisma.room.create({ data: createRoomDto });
@@ -34,5 +37,18 @@ export class RoomService {
       label: name,
     }));
     return { data: formattedList };
+  }
+
+  async getAvailableRooms() {
+    const currentEvents = (await this.scheduleService.getCurrentEvents()).data;
+    const busyRoomsId = new Set(
+      currentEvents.map((event) => event.roomId),
+    );
+    const allRooms = await this.prisma.room.findMany({});
+    const availableRooms = allRooms.filter(
+      (room) => !busyRoomsId.has(room.id),
+    );
+
+    return { data: availableRooms };
   }
 }

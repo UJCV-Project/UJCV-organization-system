@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CreateAcademicPeriodDto } from './dto/create-academic-period.dto';
-import { PrismaService } from 'src/utils/prisma/prisma.service';
+import { PrismaService } from 'src/common/prisma/prisma.service';
 import { envs } from 'src/config';
 import { SelectOption } from 'src/common/types/select-option';
 
@@ -43,6 +43,11 @@ export class AcademicPeriodService {
     };
   }
 
+  async getAllPeriods(){
+    const periods = await this.prisma.academicPeriod.findMany({});
+    return {data: periods}
+  }
+
   async selectOptions() {
     const academicPeriodList = await this.prisma.academicPeriod.findMany({
       select: {
@@ -79,10 +84,10 @@ export class AcademicPeriodService {
     return { data: currentAcademicPeriod };
   }
 
-  async find(id: string) {
+  async getPeriodById(periodId: string) {
     const academicPeriod = await this.prisma.academicPeriod.findFirst({
       where: {
-        id,
+        id: periodId,
       },
       take: 1,
     });

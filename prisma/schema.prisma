@@ -7,24 +7,47 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+/**
+ * Professor Schema
+ */
+
 model Professor {
-  id          String     @id @default(uuid())
-  code        String     @unique @db.VarChar(20)
-  firstName   String     @db.VarChar(50)
-  lastName    String     @db.VarChar(50)
-  email       String     @unique
-  phoneNumber String     @db.VarChar(20)
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  status      String     @default("Activo") @db.VarChar(10)
+  id          String                    @id @default(uuid())
+  code        String                    @unique @db.VarChar(20)
+  firstName   String                    @db.VarChar(50)
+  lastName    String                    @db.VarChar(50)
+  email       String                    @unique
+  phoneNumber String                    @db.VarChar(20)
+  createdAt   DateTime                  @default(now())
+  updatedAt   DateTime                  @updatedAt
+  status      String                    @default("Activo") @db.VarChar(10)
+  available   ProfessorAvailableSlots[]
   schedule    Schedule[]
 }
+
+model ProfessorAvailableSlots {
+  id          String    @id @default(uuid())
+  professorId String
+  day         Int
+  startTime   Int
+  endTime     Int
+  professor   Professor @relation(fields: [professorId], references: [id])
+
+  @@index([professorId, day])
+  @@index([day, startTime])
+}
+
+/**
+ * Course Schema
+ */
 
 model Degree {
   id         String       @id @default(uuid())
   code       String       @unique
   name       String
   status     DegreeStatus @default(activo)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
   curriculum Curriculum[]
 }
 
@@ -36,52 +59,71 @@ model Course {
   theoryHours   Int
   practiceHours Int
   status        CourseStatus @default(activo)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
   curriculum    Curriculum[]
   Schedule      Schedule[]
 }
 
 model Curriculum {
-  degreeId String
-  courseId String
-  semester Int?
-  course   Course @relation(fields: [courseId], references: [id])
-  degree   Degree @relation(fields: [degreeId], references: [id])
+  degreeId  String
+  courseId  String
+  semester  Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  course    Course   @relation(fields: [courseId], references: [id])
+  degree    Degree   @relation(fields: [degreeId], references: [id])
 
   @@id([degreeId, courseId])
 }
 
+/**
+ * University Managment
+ */
 model AcademicPeriod {
   id        String     @id @default(uuid())
   year      Int
   period    Int
   startDate DateTime
   endDate   DateTime
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
   schedules Schedule[]
 }
 
 model Room {
-  id        String     @id @default(uuid())
-  name      String     @db.VarChar(30)
-  room_type String     @db.VarChar(30)
-  capacity  Int        @db.SmallInt
-  building  String     @db.VarChar(30)
-  floor     Int        @db.SmallInt
-  equipment String?    @default("") @db.VarChar
+  id        String  @id @default(uuid())
+  name      String  @default("") @db.VarChar(30)
+  room_type String  @default("") @db.VarChar(30)
+  capacity  Int     @default(0) @db.SmallInt
+  building  String  @default("") @db.VarChar(30)
+  floor     Int     @default(1) @db.SmallInt
+  equipment String? @default("") @db.VarChar
+
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
   schedules Schedule[]
 }
 
+/**
+ * Schedule Schema
+ */
 model Schedule {
-  id               String         @id @default(uuid())
+  id               String @id @default(uuid())
   academicPeriodId String
   professorId      String
   courseId         String
   roomId           String
   section          String
-  events           Event[]
-  academicPeriod   AcademicPeriod @relation(fields: [academicPeriodId], references: [id])
-  course           Course         @relation(fields: [courseId], references: [id])
-  professor        Professor      @relation(fields: [professorId], references: [id])
-  room             Room           @relation(fields: [roomId], references: [id])
+  observations     String @default("")
+
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  events         Event[]
+  academicPeriod AcademicPeriod @relation(fields: [academicPeriodId], references: [id])
+  course         Course         @relation(fields: [courseId], references: [id])
+  professor      Professor      @relation(fields: [professorId], references: [id])
+  room           Room           @relation(fields: [roomId], references: [id])
 
   @@index([academicPeriodId])
   @@index([professorId])
@@ -100,6 +142,79 @@ model Event {
   @@index([scheduleId])
 }
 
+model ScheduleDiscussion {
+  messageId       String    @id @default(uuid())
+  authorId        String
+  content         String
+  parentMessageId String?  
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  author          User      @relation(fields: [authorId], references: [userId])
+
+  parentMessage   ScheduleDiscussion? @relation("MessageThread", fields: [parentMessageId], references: [messageId])
+  replies         ScheduleDiscussion[] @relation("MessageThread")
+}
+
+model ScheduleChangeRequest {
+  requestId String @id @default(uuid())
+  requestType String
+  scheduleId String
+}
+
+/**
+ * Auth Schema
+ */
+
+model User {
+  userId        String    @id @default(uuid())
+  email         String    @unique
+  passwordHash  String? // Password hash (nullable for OAuth)
+  oauthProvider String? // OAuth provider (nullable if not using OAuth)
+  oauthId       String? // OAuth id provided by the defined OAuth provider
+  firstName     String
+  lastName      String
+  picture       String?
+  roleId        String
+  role          Role      @relation(fields: [roleId], references: [roleId])
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  lastLogin     DateTime?
+
+  scheduleMessages ScheduleDiscussion[]
+}
+
+/* Simple RBAC*/
+model Role {
+  roleId      String           @id @default(uuid())
+  roleName    String           @unique
+  description String?
+  users       User[]
+  permissions RolePermission[]
+}
+
+
+/* More complex ABAC */
+model Permission {
+  permissionId   String           @id @default(uuid())
+  permissionName String           @unique // Name of the permission (e.g., "can_edit_schedule")
+  roles          RolePermission[]
+}
+
+/* Relation if needed */
+model RolePermission {
+  roleId       String
+  permissionId String
+  role         Role       @relation(fields: [roleId], references: [roleId])
+  permission   Permission @relation(fields: [permissionId], references: [permissionId])
+
+  @@id([roleId, permissionId])
+}
+
+
+
+//!Keep for now but delete later
 enum DegreeStatus {
   activo
   inactivo
@@ -108,11 +223,4 @@ enum DegreeStatus {
 enum CourseStatus {
   activo
   inactivo
-}
-
-enum ProfessorStatus {
-  activo
-  inactivo
-  jubilado
-  de_baja
 }
