@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CreateAcademicPeriodDto } from './dto/create-academic-period.dto';
-import { PrismaService } from 'src/utils/prisma/prisma.service';
+import { PrismaService } from 'src/common/prisma/prisma.service';
 import { envs } from 'src/config';
 import { SelectOption } from 'src/common/types/select-option';
 

@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { CreateRoomDto } from './dto/create-room.dto';
-import { PrismaService } from 'src/utils/prisma/prisma.service';
+import { PrismaService } from 'src/common/prisma/prisma.service';
 import { SelectOption } from 'src/common/types/select-option';
-import { ScheduleService } from '../schedule/schedule.service';
+import { ScheduleService } from '../schedule-ms/schedule/schedule.service';
 
 @Injectable()
 export class RoomService {

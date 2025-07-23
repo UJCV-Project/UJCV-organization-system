@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { RoomService } from './room.service';
 import { RoomController } from './room.controller';
-import { PrismaModule } from 'src/utils/prisma/prisma.module';
-import { ScheduleModule } from '../schedule/schedule.module';
+import { PrismaModule } from 'src/common/prisma/prisma.module';
+import { ScheduleModule } from '../schedule-ms/schedule/schedule.module';
 
 @Module({
   imports:[PrismaModule,ScheduleModule],

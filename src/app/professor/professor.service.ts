@@ -5,14 +5,14 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { PrismaService } from 'src/utils/prisma/prisma.service';
+import { PrismaService } from 'src/common/prisma/prisma.service';
 import { CreateProfessorDto, GetProfessorDto, UpdateProfessorDto } from './dto';
 import { ProfessorStatus } from './enums/professorStatus';
 import { SelectOption } from 'src/common/types/select-option';
-import { ScheduleService } from '../schedule/schedule.service';
 import { ProfessorActivity } from './enums/professorActivity';
-import { formatTime } from 'src/common/formaters/time-format';
-import { days } from 'src/common/days';
+import { formatTime } from 'src/common/utils/time-format';
+import { days } from 'src/common/utils/days';
+import { ScheduleService } from '../schedule-ms/schedule/schedule.service';
 
 @Injectable()
 export class ProfessorService {
