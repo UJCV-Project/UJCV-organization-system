@@ -3,6 +3,8 @@ services:
     build: .
     ports:
       - "17504:3000"
+    env_file:
+      - .env.template
     environment:
       - PORT=3000
       - DATABASE_URL=postgresql://postgres:example@db:5432/classes?schema=public
