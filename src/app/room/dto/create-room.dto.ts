@@ -28,5 +28,10 @@ export class CreateRoomDto {
 
     @IsString()
     @IsOptional()
-    equipment: string; //It can also be a string separated by comma
+    equipment: string;
+
+    @IsArray()
+    @IsString({ each: true })
+    @IsOptional()
+    scheduled_hours?: string[];
 }
