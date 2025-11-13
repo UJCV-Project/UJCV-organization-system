@@ -14,7 +14,7 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Injectable()
 export class CourseService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
   logger = new Logger('Course Service');
 
   async create(createCourseDto: CreateCourseDto) {

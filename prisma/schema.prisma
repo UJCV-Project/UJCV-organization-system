@@ -59,8 +59,6 @@ model Course {
   theoryHours   Int
   practiceHours Int
   status        CourseStatus @default(activo)
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
   curriculum    Curriculum[]
   Schedule      Schedule[]
 }
